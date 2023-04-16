@@ -22,20 +22,23 @@ def hash_string(s: str) -> int:
 
 def piece_exists(piece: dict) -> bool:
     """checks if piece exists in database"""
-    title_exist = Title.query.filter_by(
-        id=hash_string(piece["title"])
-    ).count()
-    subtitle_exist = Subtitle.query.filter_by(
-        id=hash_string(piece["subtitle"])
-    ).count()
+    title_exist = (db.session
+                   .query(Title.id)
+                   .filter_by(id=hash_string(piece["title"]))
+                   .count())
+    subtitle_exist = (db.session
+                      .query(Subtitle.id)
+                      .filter_by(id=hash_string(piece["subtitle"]))
+                      .count())
     return True if title_exist and subtitle_exist else False
 
 
 def composer_exists(composer: dict) -> bool:
     """checks if composer exists in database"""
-    result = Composer.query.filter_by(
-        id=hash_string(composer["full_name"])
-    ).count()
+    result = (db.session
+              .query(Composer.id)
+              .filter_by(id=hash_string(composer["full_name"]))
+              .count())
     return True if result else False
 
 
@@ -49,7 +52,6 @@ def add_composer(composer: dict):
             first_name=composer["first_name"],
             last_name=composer["last_name"],
         ))
-        db.session.commit()
     except Exception:
         db.session.rollback()
         raise
@@ -88,7 +90,6 @@ def add_piece(piece: dict):
                 string=full_year
             ))
 
-        db.session.commit()
     except Exception:
         db.session.rollback()
         raise
@@ -103,6 +104,16 @@ def add_log(new_composers, new_pieces):
         db.session.rollback()
         raise
 
+def loading_bar(a:int,b:int)->str:
+    bar = "|"
+    for i in range(b):
+        if i < a+1:
+            bar += "="
+        else:
+            bar += "."
+    bar += "|"
+    return bar
+
 
 def update_database():
     new_pieces = 0
@@ -110,19 +121,20 @@ def update_database():
     print("Updating database...")
     print("Getting number of pages")
     num_pages = scraper.get_num_pages()
-    print(f"Current number of pages is {num_pages}")
+    print(f"Current number of pages is {num_pages}\n")
 
     for i in range(num_pages):
         cur_page = i+1
         url = scraper.get_url(cur_page)
-        print(f"Scraping page {cur_page}/{num_pages}")
+        print(f"Scraping page {cur_page} of {num_pages}")
         try:
             with requests.get(url, timeout=10) as page:
                 print("Page request successful.")
-                print("Processing page...")
+                print("Processing page...\n")
                 pieces = scraper.process_page(page)
                 for i, p in enumerate(pieces):
-                    print(f"Processing piece {i+1}/{len(pieces)}")
+                    print("\r", end="")
+                    print(f"Processing piece {i+1}/{len(pieces)} {loading_bar(i,len(pieces))}", end="")
                     piece = scraper.extract_piece(p)
                     composer = scraper.process_composer(piece["composer"])
                     piece_exist = piece_exists(piece)
@@ -133,8 +145,9 @@ def update_database():
                     if not composer_exist:
                         add_composer(composer)
                         new_composers += 1
-                    print("")
+                db.session.commit()
                 p.decompose()
+                print("\n\n")
         except Exception as e:
             print(f"An error occured on page {cur_page}")
             print(f"Error: \n {e}")
@@ -143,7 +156,7 @@ def update_database():
     db.session.close()
 
 
-@bp.route("/sync", methods=["POST"])
+@ bp.route("/sync", methods=["POST"])
 def sync():
     """
     The endpoint that syncs the database.
@@ -161,7 +174,7 @@ def sync():
         token = data["token"]
         return f"Incorrect token: {token}"
 
-    @copy_current_request_context
+    @ copy_current_request_context
     def update_wrapper():
         update_database()
 
@@ -169,7 +182,7 @@ def sync():
     return "Authentification successful. Beginning database update.\n"
 
 
-@bp.route("/echo", methods=["POST"])
+@ bp.route("/echo", methods=["POST"])
 def echo():
     print(request.headers)
     data = request.get_json()

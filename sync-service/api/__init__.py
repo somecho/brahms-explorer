@@ -5,7 +5,7 @@ import os
 
 load_dotenv()
 
-db = SQLAlchemy()
+db: SQLAlchemy = SQLAlchemy()
 HOST = os.environ['HOST']
 DATABASE = os.environ['DATABASE']
 USERNAME = os.environ['USERNAME']
