@@ -3,11 +3,12 @@ from flask import (Blueprint, request, copy_current_request_context)
 import requests
 from dotenv import load_dotenv
 from . import scraper
-from .models import Piece, Composer, Log
+from .models import Title, Subtitle, Composer, Log, Piece, FullYear
 from . import db
 import os
 import threading
-import datetime
+# import datetime
+from hashlib import md5
 
 
 load_dotenv()
@@ -15,38 +16,80 @@ TOKEN = os.environ["TOKEN"]
 bp = Blueprint('api', __name__, url_prefix="/api")
 
 
-def piece_exists(piece: Piece) -> bool:
+def hash_string(s: str) -> int:
+    return int(md5(s.encode("UTF-8")).hexdigest(), 16) % 10 ** 8
+
+
+def piece_exists(piece: dict) -> bool:
     """checks if piece exists in database"""
-    result = Piece.query.filter_by(
-        title=piece.title,
-        subtitle=piece.subtitle,
-        composer=piece.composer
-    ).all()
+    result = (Piece.query
+              .filter_by(
+                  title=hash_string(piece["title"]),
+                  subtitle=hash_string(piece["subtitle"]),
+                  composer=hash_string(piece["composer"]),
+              )
+              .all()
+              )
     return True if result else False
 
 
-def composer_exists(composer: Composer) -> bool:
+def composer_exists(composer: dict) -> bool:
     """checks if composer exists in database"""
     result = Composer.query.filter_by(
-        full_name=composer.full_name
-    ).all()
+        id=hash_string(composer["full_name"])
+    ).count()
     return True if result else False
 
 
-def add_composer(composer: Composer):
-    print(f"Adding {composer.full_name}")
+def add_composer(composer: dict):
+    full_name = composer["full_name"]
+    print(f"Adding {full_name}")
     try:
-        db.session.add(composer)
+        db.session.add(Composer(
+            id=hash_string(full_name),
+            string=full_name,
+            first_name=composer["first_name"],
+            last_name=composer["last_name"],
+        ))
         db.session.commit()
     except Exception:
         db.session.rollback()
         raise
 
 
-def add_piece(piece: Piece):
-    print(f"Adding {piece.title} by {piece.composer}")
+def add_piece(piece: dict):
+    title = piece["title"]
+    composer = piece["composer"]
+    subtitle = piece["subtitle"]
+    full_year = piece["full_year"]
+    print(f"Adding {title} by {composer}")
     try:
-        db.session.add(piece)
+        db.session.add(Piece(
+            title=hash_string(title),
+            subtitle=hash_string(subtitle),
+            year=piece["year"],
+            full_year=hash_string(full_year),
+            composer=hash_string(composer),
+            duration=piece["duration"]
+        ))
+        if not Title.query.filter_by(id=hash_string(title)).count():
+            db.session.add(Title(
+                id=hash_string(title),
+                string=title
+            )),
+
+        if not Subtitle.query.filter_by(id=hash_string(subtitle)).count():
+            db.session.add(Subtitle(
+                id=hash_string(subtitle),
+                string=subtitle
+            ))
+
+        if not FullYear.query.filter_by(id=hash_string(full_year)).count():
+            db.session.add(FullYear(
+                id=hash_string(full_year),
+                string=full_year
+            ))
+
         db.session.commit()
     except Exception:
         db.session.rollback()
@@ -70,16 +113,11 @@ def update_database():
     print("Getting number of pages")
     num_pages = scraper.get_num_pages()
     print(f"Current number of pages is {num_pages}")
-    hour = int(datetime.datetime.now().hour)
-    day = int(datetime.datetime.now().timetuple().tm_yday) % 10
-    start = int(float(((day * 2) + (hour / 12)) % 20) / 20.0 * num_pages)
-    end = int(float(((day * 2) + (hour / 12) + 1) % 20) / 20.0 * num_pages)
-    print(f"Scraping {start} to {end}")
 
-    for i in range(start, end+1):
+    for i in range(num_pages):
         cur_page = i+1
         url = scraper.get_url(cur_page)
-        print(f"Scraping page {cur_page}/({end}){num_pages}")
+        print(f"Scraping page {cur_page}/{num_pages}")
         try:
             with requests.get(url, timeout=10) as page:
                 print("Page request successful.")
@@ -88,7 +126,7 @@ def update_database():
                 for i, p in enumerate(pieces):
                     print(f"Processing piece {i+1}/{len(pieces)}")
                     piece = scraper.extract_piece(p)
-                    composer = scraper.process_composer(piece.composer)
+                    composer = scraper.process_composer(piece["composer"])
                     piece_exist = piece_exists(piece)
                     composer_exist = composer_exists(composer)
                     if not piece_exist:
@@ -97,7 +135,7 @@ def update_database():
                     if not composer_exist:
                         add_composer(composer)
                         new_composers += 1
-                    print("\n")
+                    print("")
                 p.decompose()
         except Exception as e:
             print(f"An error occured on page {cur_page}")

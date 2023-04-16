@@ -4,7 +4,6 @@ import re
 from bs4 import BeautifulSoup
 import bs4
 from . import regex
-from .models import Piece, Composer
 
 
 def get_url(page_num: int = 1) -> str:
@@ -116,30 +115,29 @@ def get_title(tag: bs4.element.Tag) -> str:
     return tag.findAll('a')[0].getText().replace('"', '')
 
 
-def process_composer(composer: str) -> Composer:
-    return Composer(
-        full_name=composer,
-        first_name=composer.split(' ')[0],
-        last_name=composer.split(' ')[-1],
-        middle_name=' '.join(composer.split(' ')[1:-1])
-    )
+def process_composer(composer: str) -> dict:
+    return {
+        'full_name': composer,
+        'first_name': composer.split(' ')[0],
+        'last_name': composer.split(' ')[-1],
+    }
 
 
-def extract_piece(piece: bs4.element.Tag) -> Piece:
+def extract_piece(piece: bs4.element.Tag) -> dict:
     remove_span(piece)
     title = get_title(piece)
     composer = get_composer(piece)
     stripped = strip_title_composer(piece)
     subtitle = get_subtitle(stripped)
-    year_full = get_year(stripped)
-    year_short = int(year_full[:4]) if year_full else None
+    full_year = get_year(stripped)
+    year = int(full_year[:4]) if full_year else None
     duration = get_duration(stripped)
     piece.decompose()
-    return Piece(
-        title=title,
-        subtitle=subtitle,
-        composer=composer,
-        year_full=year_full,
-        year_short=year_short,
-        duration=duration
-    )
+    return {
+        'title': title,
+        'subtitle': subtitle,
+        'composer': composer,
+        'full_year': full_year,
+        'year': year,
+        'duration': duration
+    }

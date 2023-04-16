@@ -10,7 +10,8 @@ HOST = os.environ['HOST']
 DATABASE = os.environ['DATABASE']
 USERNAME = os.environ['USERNAME']
 PASSWORD = os.environ['PASSWORD']
-database_uri = f"mysql://{USERNAME}:{PASSWORD}@{HOST}/{DATABASE}?ssl_ca=/etc/ssl/certs/ca-certificates.crt"
+CERT = "ssl_ca=/etc/ssl/certs/ca-certificates.crt"
+database_uri = f"mysql://{USERNAME}:{PASSWORD}@{HOST}/{DATABASE}?{CERT}"
 
 
 def create_app():
@@ -27,7 +28,6 @@ def create_app():
     app.register_blueprint(sync.bp)
 
     def clean_up(e=None):
-        print("cleaning up...")
         db.session.close()
 
     app.teardown_appcontext(clean_up)

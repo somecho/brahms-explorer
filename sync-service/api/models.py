@@ -2,28 +2,39 @@ from . import db
 import datetime
 
 
+class Title(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    string = db.Column(db.String(200))
+
+
+class Subtitle(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    string = db.Column(db.String(300))
+
+
+class FullYear(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    string = db.Column(db.String(30))
+
+
 class Composer(db.Model):
-    __tablename__ = "composers"
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    full_name = db.Column(db.String(128), nullable=False)
-    first_name = db.Column(db.String(32), nullable=False)
-    middle_name = db.Column(db.String(56))
-    last_name = db.Column(db.String(32), nullable=False)
+    id = db.Column(db.Integer, primary_key=True)
+    string = db.Column(db.String(32))
+    first_name = db.Column(db.String(32))
+    last_name = db.Column(db.String(32))
 
 
 class Piece(db.Model):
-    __tablename__ = "pieces"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    title = db.Column(db.String(200))
-    subtitle = db.Column(db.String(300))
-    composer = db.Column(db.String(128))
-    year_short = db.Column(db.Integer)
-    year_full = db.Column(db.String(32))
+    title = db.Column(db.Integer)
+    subtitle = db.Column(db.Integer)
+    year = db.Column(db.Integer)
+    full_year = db.Column(db.String(32))
+    composer = db.Column(db.Integer)
     duration = db.Column(db.Integer)
 
 
 class Log(db.Model):
-    __tablename__ = "logs"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     new_composers = db.Column(db.Integer)
     new_pieces = db.Column(db.Integer)
