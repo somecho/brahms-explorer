@@ -22,15 +22,13 @@ def hash_string(s: str) -> int:
 
 def piece_exists(piece: dict) -> bool:
     """checks if piece exists in database"""
-    result = (Piece.query
-              .filter_by(
-                  title=hash_string(piece["title"]),
-                  subtitle=hash_string(piece["subtitle"]),
-                  composer=hash_string(piece["composer"]),
-              )
-              .all()
-              )
-    return True if result else False
+    title_exist = Title.query.filter_by(
+        id=hash_string(piece["title"])
+    ).count()
+    subtitle_exist = Subtitle.query.filter_by(
+        id=hash_string(piece["subtitle"])
+    ).count()
+    return True if title_exist and subtitle_exist else False
 
 
 def composer_exists(composer: dict) -> bool:
