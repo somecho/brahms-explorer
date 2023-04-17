@@ -99,7 +99,8 @@ def add_log(new_composers, new_pieces):
         db.session.rollback()
         raise
 
-def loading_bar(a:int,b:int)->str:
+
+def loading_bar(a: int, b: int) -> str:
     bar = "|"
     for i in range(b):
         if i < a+1:
@@ -108,6 +109,7 @@ def loading_bar(a:int,b:int)->str:
             bar += "."
     bar += "|"
     return bar
+
 
 @click.command('sync-db')
 def update_database():
@@ -129,7 +131,8 @@ def update_database():
                 pieces = scraper.process_page(page)
                 for i, p in enumerate(pieces):
                     print("\r", end="")
-                    print(f"Processing piece {i+1}/{len(pieces)} {loading_bar(i,len(pieces))}", end="")
+                    print(
+                        f"Processing piece {i+1}/{len(pieces)} {loading_bar(i,len(pieces))}", end="")
                     piece = scraper.extract_piece(p)
                     composer = scraper.process_composer(piece["composer"])
                     piece_exist = piece_exists(piece)
