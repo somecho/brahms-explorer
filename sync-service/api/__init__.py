@@ -6,13 +6,10 @@ import os
 load_dotenv()
 
 db: SQLAlchemy = SQLAlchemy()
-# HOST = os.environ['HOST']
-DATABASE = "brahms"
-HOST = "aws.connect.psdb.cloud"
-# DATABASE = os.environ['DATABASE']
-# USERNAME = os.environ['USERNAME']
+HOST = os.environ['HOST']
+DATABASE = os.environ['DATABASE']
+USERNAME = os.environ['USERNAME']
 PASSWORD = os.environ['PASSWORD']
-USERNAME = "jsay2f5305nnec0dqg56"
 CERT = "ssl_ca=/etc/ssl/certs/ca-certificates.crt"
 database_uri = f"mysql://{USERNAME}:{PASSWORD}@{HOST}/{DATABASE}?{CERT}"
 

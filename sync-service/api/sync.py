@@ -1,19 +1,13 @@
 from __future__ import annotations
 from flask import (Blueprint, request, copy_current_request_context)
 import requests
-from dotenv import load_dotenv
 from . import scraper
 from .models import Title, Subtitle, Composer, Log, Piece, FullYear
 from . import db
-import os
-import threading
-# import datetime
 from hashlib import md5
 import click
 
 
-load_dotenv()
-# TOKEN = os.environ["TOKEN"]
 bp = Blueprint('api', __name__, url_prefix="/api")
 
 
@@ -155,36 +149,3 @@ def update_database():
     add_log(new_composers, new_pieces)
     print("Database sync completed")
     db.session.close()
-
-
-# @ bp.route("/sync", methods=["POST"])
-# def sync():
-#     """
-#     The endpoint that syncs the database.
-#     Receives a POST request with auth token in body.
-#     Updates the database using a thread so it does not block
-#     the response.
-#     """
-#     print(request.headers)
-#     data = request.get_json()
-
-#     if "token" not in data:
-#         return "No token in body found."
-
-#     if data["token"] != TOKEN:
-#         token = data["token"]
-#         return f"Incorrect token: {token}"
-
-#     @ copy_current_request_context
-#     def update_wrapper():
-#         update_database()
-
-#     threading.Thread(target=update_wrapper).start()
-#     return "Authentification successful. Beginning database update.\n"
-
-
-@ bp.route("/echo", methods=["POST"])
-def echo():
-    print(request.headers)
-    data = request.get_json()
-    return data
