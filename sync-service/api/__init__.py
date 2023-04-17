@@ -32,4 +32,7 @@ def create_app():
 
     app.teardown_appcontext(clean_up)
 
+    from .sync import update_database
+    app.cli.add_command(update_database)
+
     return app

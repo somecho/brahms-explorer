@@ -9,6 +9,7 @@ import os
 import threading
 # import datetime
 from hashlib import md5
+import click
 
 
 load_dotenv()
@@ -114,7 +115,7 @@ def loading_bar(a:int,b:int)->str:
     bar += "|"
     return bar
 
-
+@click.command('sync-db')
 def update_database():
     new_pieces = 0
     new_composers = 0

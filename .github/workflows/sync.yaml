@@ -13,11 +13,16 @@ jobs:
       - name: Get MySQL
         run: |
           apt-get update
-          apt-get -y install default-libmysqlclient-dev build-essential
+          apt-get -y install default-libmysqlclient-dev build-essential python3-pip
       - name: Install Dependencies
         working-directory: sync-service
         run: |
           pip install -r requirements.txt
-      - name: Test
+      - name: Synchronise Database
+        env:
+          HOST: ${{secrets.HOST}}
+          USERNAME: ${{secrets.USERNAME}}
+          DATABASE: ${{secrets.DATABASE}}
+          PASSWORD: ${{secrets.PASSWORD}}
         run: |
-          echo "github actions hello!"
+          flask --app sync-service/api sync-db
