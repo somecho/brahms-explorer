@@ -13,7 +13,7 @@ import click
 
 
 load_dotenv()
-TOKEN = os.environ["TOKEN"]
+# TOKEN = os.environ["TOKEN"]
 bp = Blueprint('api', __name__, url_prefix="/api")
 
 
@@ -157,30 +157,30 @@ def update_database():
     db.session.close()
 
 
-@ bp.route("/sync", methods=["POST"])
-def sync():
-    """
-    The endpoint that syncs the database.
-    Receives a POST request with auth token in body.
-    Updates the database using a thread so it does not block
-    the response.
-    """
-    print(request.headers)
-    data = request.get_json()
+# @ bp.route("/sync", methods=["POST"])
+# def sync():
+#     """
+#     The endpoint that syncs the database.
+#     Receives a POST request with auth token in body.
+#     Updates the database using a thread so it does not block
+#     the response.
+#     """
+#     print(request.headers)
+#     data = request.get_json()
 
-    if "token" not in data:
-        return "No token in body found."
+#     if "token" not in data:
+#         return "No token in body found."
 
-    if data["token"] != TOKEN:
-        token = data["token"]
-        return f"Incorrect token: {token}"
+#     if data["token"] != TOKEN:
+#         token = data["token"]
+#         return f"Incorrect token: {token}"
 
-    @ copy_current_request_context
-    def update_wrapper():
-        update_database()
+#     @ copy_current_request_context
+#     def update_wrapper():
+#         update_database()
 
-    threading.Thread(target=update_wrapper).start()
-    return "Authentification successful. Beginning database update.\n"
+#     threading.Thread(target=update_wrapper).start()
+#     return "Authentification successful. Beginning database update.\n"
 
 
 @ bp.route("/echo", methods=["POST"])

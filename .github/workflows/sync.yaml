@@ -13,6 +13,7 @@ jobs:
       - name: Get MySQL
         run: |
           apt-get update
+          # apt-get -y install mysql-server
           apt-get -y install default-libmysqlclient-dev build-essential python3-pip
       - name: Install Dependencies
         working-directory: sync-service
