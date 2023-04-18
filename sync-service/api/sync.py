@@ -1,12 +1,12 @@
 from __future__ import annotations
 from flask import (Blueprint, request, copy_current_request_context)
 import requests
+from requests import Timeout
 from . import scraper
 from .models import Title, Subtitle, Composer, Log, Piece, FullYear
 from . import db
 from hashlib import md5
 import click
-
 
 bp = Blueprint('api', __name__, url_prefix="/api")
 
@@ -17,39 +17,40 @@ def hash_string(s: str) -> int:
 
 def piece_exists(piece: dict) -> bool:
     """checks if piece exists in database"""
-    title_exist = (db.session
-                   .query(Title.id)
-                   .filter_by(id=hash_string(piece["title"]))
-                   .count())
-    subtitle_exist = (db.session
-                      .query(Subtitle.id)
-                      .filter_by(id=hash_string(piece["subtitle"]))
-                      .count())
-    return True if title_exist and subtitle_exist else False
+    with db.session.begin():
+        title_exist = (db.session
+                       .query(Title.id)
+                       .filter_by(id=hash_string(piece["title"]))
+                       .count())
+        subtitle_exist = (db.session
+                          .query(Subtitle.id)
+                          .filter_by(id=hash_string(piece["subtitle"]))
+                          .count())
+        return True if title_exist and subtitle_exist else False
+    return True  # skip current piece incase an error occurs
 
 
 def composer_exists(composer: dict) -> bool:
     """checks if composer exists in database"""
-    result = (db.session
-              .query(Composer.id)
-              .filter_by(id=hash_string(composer["full_name"]))
-              .count())
-    return True if result else False
+    with db.session.begin():
+        result = (db.session
+                  .query(Composer.id)
+                  .filter_by(id=hash_string(composer["full_name"]))
+                  .count())
+        return True if result else False
+    return False
 
 
 def add_composer(composer: dict):
     full_name = composer["full_name"]
     print(f"Adding {full_name}")
-    try:
+    with db.session.begin():
         db.session.add(Composer(
             id=hash_string(full_name),
             string=full_name,
             first_name=composer["first_name"],
             last_name=composer["last_name"],
         ))
-    except Exception:
-        db.session.rollback()
-        raise
 
 
 def add_piece(piece: dict):
@@ -58,7 +59,7 @@ def add_piece(piece: dict):
     subtitle = piece["subtitle"]
     full_year = piece["full_year"]
     print(f"Adding {title} by {composer}")
-    try:
+    with db.session.begin():
         db.session.add(Piece(
             title=hash_string(title),
             subtitle=hash_string(subtitle),
@@ -84,10 +85,6 @@ def add_piece(piece: dict):
                 id=hash_string(full_year),
                 string=full_year
             ))
-
-    except Exception:
-        db.session.rollback()
-        raise
 
 
 def add_log(new_composers, new_pieces):
@@ -143,11 +140,14 @@ def update_database():
                     if not composer_exist:
                         add_composer(composer)
                         new_composers += 1
-                db.session.commit()
                 print("\n\n")
+        except Timeout:
+            print(f"timeout on page {cur_page}\n")
+            continue
         except Exception as e:
             print(f"An error occured on page {cur_page}")
-            print(f"Error: \n {e}")
+            print(f"Error: \n {e}\n")
+            continue
     add_log(new_composers, new_pieces)
     print("Database sync completed")
     db.session.close()
