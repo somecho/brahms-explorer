@@ -10,12 +10,15 @@ bp = Blueprint("api", __name__, url_prefix="/api/")
 @bp.route("/pieces/count")
 def pieces_count():
     keywords = process_keywords(request.args.get("keywords"))
-    or_queries = [or_(Piece.title.contains(w),
-                      Piece.subtitle.contains(w),
-                      Piece.composer.contains(w),
-                      Piece.year_full.contains(w)) for w in keywords]
+    or_queries = [or_(Title.string.contains(w),
+                      Subtitle.string.contains(w),
+                      Composer.string.contains(w),
+                      FullYear.string.contains(w)) for w in keywords]
     count = (Piece.query
-             .join(Composer, Piece.composer == Composer.full_name)
+             .join(Composer, Piece.composer == Composer.id)
+             .join(Title, Piece.title == Title.id)
+             .join(Subtitle, Piece.subtitle == Subtitle.id)
+             .join(FullYear, Piece.full_year == FullYear.id)
              .filter(and_(*or_queries))
              .count())
     return {'size': count}
