@@ -117,9 +117,7 @@ def update_database():
     num_pages = scraper.get_num_pages()
     print(f"Current number of pages is {num_pages}\n")
     start_time = time.time()
-    num_pages = 5
-    offset_page = 5
-    for i in range(offset_page, offset_page+num_pages):
+    for i in range(num_pages):
         cur_page = i+1
         url = scraper.get_url(cur_page)
         print(f"Scraping page {cur_page} of {num_pages}")
