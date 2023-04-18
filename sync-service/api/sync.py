@@ -7,6 +7,7 @@ from .models import Title, Subtitle, Composer, Log, Piece, FullYear
 from . import db
 from hashlib import md5
 import click
+import time
 
 bp = Blueprint('api', __name__, url_prefix="/api")
 
@@ -17,74 +18,71 @@ def hash_string(s: str) -> int:
 
 def piece_exists(piece: dict) -> bool:
     """checks if piece exists in database"""
-    with db.session.begin():
-        title_exist = (db.session
-                       .query(Title.id)
-                       .filter_by(id=hash_string(piece["title"]))
-                       .count())
-        subtitle_exist = (db.session
-                          .query(Subtitle.id)
-                          .filter_by(id=hash_string(piece["subtitle"]))
-                          .count())
-        return True if title_exist and subtitle_exist else False
-    return True  # skip current piece incase an error occurs
+    title_exist = (db.session
+                   .query(Title.id)
+                   .filter_by(id=hash(piece["title"]))
+                   .count())
+    subtitle_exist = (db.session
+                      .query(Subtitle.id)
+                      .filter_by(id=hash(piece["subtitle"]))
+                      .count())
+    return True if title_exist and subtitle_exist else False
 
 
 def composer_exists(composer: dict) -> bool:
     """checks if composer exists in database"""
-    with db.session.begin():
-        result = (db.session
-                  .query(Composer.id)
-                  .filter_by(id=hash_string(composer["full_name"]))
-                  .count())
-        return True if result else False
-    return False
+    result = (db.session
+              .query(Composer.id)
+              .filter_by(id=hash(composer["full_name"]))
+              .count())
+    return True if result else False
 
 
 def add_composer(composer: dict):
     full_name = composer["full_name"]
     print(f"Adding {full_name}")
-    with db.session.begin():
-        db.session.add(Composer(
-            id=hash_string(full_name),
-            string=full_name,
-            first_name=composer["first_name"],
-            last_name=composer["last_name"],
-        ))
+    db.session.add(Composer(
+        id=hash(full_name),
+        string=full_name,
+        first_name=composer["first_name"],
+        last_name=composer["last_name"],
+    ))
 
 
 def add_piece(piece: dict):
     title = piece["title"]
+    hash_title = hash(title)
     composer = piece["composer"]
     subtitle = piece["subtitle"]
+    hash_sub = hash(subtitle)
     full_year = piece["full_year"]
+    hash_year = hash(full_year)
     print(f"Adding {title} by {composer}")
-    with db.session.begin():
-        db.session.add(Piece(
-            title=hash_string(title),
-            subtitle=hash_string(subtitle),
-            year=piece["year"],
-            full_year=hash_string(full_year),
-            composer=hash_string(composer),
-            duration=piece["duration"]
+    db.session.add(Piece(
+        title=hash_title,
+        subtitle=hash_sub,
+        year=piece["year"],
+        full_year=hash_year,
+        composer=hash(composer),
+        duration=piece["duration"]
+    ))
+    if not Title.query.filter_by(id=hash_title).count():
+        db.session.add(Title(
+            id=hash_title,
+            string=title
         ))
-        if not Title.query.filter_by(id=hash_string(title)).count():
-            db.session.add(Title(
-                id=hash_string(title),
-                string=title
-            )),
 
-        if not Subtitle.query.filter_by(id=hash_string(subtitle)).count():
-            db.session.add(Subtitle(
-                id=hash_string(subtitle),
-                string=subtitle
-            ))
+    if not Subtitle.query.filter_by(id=hash_sub).count():
+        db.session.add(Subtitle(
+            id=hash_sub,
+            string=subtitle
+        ))
 
-        if not FullYear.query.filter_by(id=hash_string(full_year)).count():
-            db.session.add(FullYear(
-                id=hash_string(full_year),
-                string=full_year
-            ))
+    if not FullYear.query.filter_by(id=hash_year).count():
+        db.session.add(FullYear(
+            id=hash_year,
+            string=full_year
+        ))
 
 
 def add_log(new_composers, new_pieces):
@@ -116,8 +114,10 @@ def update_database():
     print("Getting number of pages")
     num_pages = scraper.get_num_pages()
     print(f"Current number of pages is {num_pages}\n")
-
-    for i in range(num_pages):
+    start_time = time.time()
+    num_pages = 5
+    offset_page = 372
+    for i in range(offset_page, offset_page+num_pages):
         cur_page = i+1
         url = scraper.get_url(cur_page)
         print(f"Scraping page {cur_page} of {num_pages}")
@@ -126,21 +126,28 @@ def update_database():
                 print("Page request successful.")
                 print("Processing page...\n")
                 pieces = scraper.process_page(page)
+                num_pieces = len(pieces)
                 for i, p in enumerate(pieces):
                     print("\r", end="")
-                    print(
-                        f"Processing piece {i+1}/{len(pieces)} {loading_bar(i,len(pieces))}", end="")
+                    bar = loading_bar(i, num_pieces)
+                    print(f"Processing piece {i+1}/{num_pieces} {bar}", end="")
                     piece = scraper.extract_piece(p)
                     composer = scraper.process_composer(piece["composer"])
                     piece_exist = piece_exists(piece)
                     composer_exist = composer_exists(composer)
-                    if not piece_exist:
-                        new_pieces += 1
-                        add_piece(piece)
-                    if not composer_exist:
-                        add_composer(composer)
-                        new_composers += 1
-                print("\n\n")
+                    try:
+                        if not piece_exist:
+                            new_pieces += 1
+                            add_piece(piece)
+                        if not composer_exist:
+                            add_composer(composer)
+                            new_composers += 1
+                        db.session.commit()
+                    except Exception:
+                        db.session.rollback()
+                        continue
+                db.session.commit()
+            print("\n\n")
         except Timeout:
             print(f"timeout on page {cur_page}\n")
             continue
@@ -148,6 +155,8 @@ def update_database():
             print(f"An error occured on page {cur_page}")
             print(f"Error: \n {e}\n")
             continue
-    add_log(new_composers, new_pieces)
+    end_time = time.time()
+    print(end_time-start_time)
+    # add_log(new_composers, new_pieces)
     print("Database sync completed")
     db.session.close()
