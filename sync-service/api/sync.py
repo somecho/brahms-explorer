@@ -5,14 +5,14 @@ from requests import Timeout
 from . import scraper
 from .models import Title, Subtitle, Composer, Log, Piece, FullYear
 from . import db
-import hashlib
+from hashlib import md5
 import click
 
 bp = Blueprint('api', __name__, url_prefix="/api")
 
 
 def hash_string(s: str) -> int:
-    return int(hashlib.sha1(str.encode("UTF-8")).hexdigest(),16) % 10**8
+    return int(md5(s.encode("UTF-8")).hexdigest(), 16) % 10**8
 
 
 def piece_exists(piece: dict) -> bool:
@@ -39,13 +39,17 @@ def composer_exists(composer: dict) -> bool:
 
 def add_composer(composer: dict):
     full_name = composer["full_name"]
-    # print(f"Adding {full_name}")
-    db.session.add(Composer(
-        id=hash_string(full_name),
-        string=full_name,
-        first_name=composer["first_name"],
-        last_name=composer["last_name"],
-    ))
+    print(f"Adding {full_name}")
+    try:
+        db.session.add(Composer(
+            id=hash_string(full_name),
+            string=full_name,
+            first_name=composer["first_name"],
+            last_name=composer["last_name"],
+        ))
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
 
 
 def add_piece(piece: dict):
@@ -56,32 +60,36 @@ def add_piece(piece: dict):
     hash_sub = hash_string(subtitle)
     full_year = piece["full_year"]
     hash_year = hash_string(full_year)
-    # print(f"Adding {title} by {composer}")
-    db.session.add(Piece(
-        title=hash_title,
-        subtitle=hash_sub,
-        year=piece["year"],
-        full_year=hash_year,
-        composer=hash_string(composer),
-        duration=piece["duration"]
-    ))
-    if not Title.query.filter_by(id=hash_title).count():
-        db.session.add(Title(
-            id=hash_title,
-            string=title
+    print(f"Adding {title} by {composer}")
+    try:
+        db.session.add(Piece(
+            title=hash_title,
+            subtitle=hash_sub,
+            year=piece["year"],
+            full_year=hash_year,
+            composer=hash_string(composer),
+            duration=piece["duration"]
         ))
+        if not Title.query.filter_by(id=hash_title).count():
+            db.session.add(Title(
+                id=hash_title,
+                string=title
+            ))
 
-    if not Subtitle.query.filter_by(id=hash_sub).count():
-        db.session.add(Subtitle(
-            id=hash_sub,
-            string=subtitle
-        ))
+        if not Subtitle.query.filter_by(id=hash_sub).count():
+            db.session.add(Subtitle(
+                id=hash_sub,
+                string=subtitle
+            ))
 
-    if not FullYear.query.filter_by(id=hash_year).count():
-        db.session.add(FullYear(
-            id=hash_year,
-            string=full_year
-        ))
+        if not FullYear.query.filter_by(id=hash_year).count():
+            db.session.add(FullYear(
+                id=hash_year,
+                string=full_year
+            ))
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
 
 
 def add_log(new_composers, new_pieces):
@@ -131,17 +139,12 @@ def update_database():
                     composer = scraper.process_composer(piece["composer"])
                     piece_exist = piece_exists(piece)
                     composer_exist = composer_exists(composer)
-                    try:
-                        if not piece_exist:
-                            new_pieces += 1
-                            add_piece(piece)
-                        if not composer_exist:
-                            add_composer(composer)
-                            new_composers += 1
-                        db.session.commit()
-                    except Exception:
-                        db.session.rollback()
-                        continue
+                    if not piece_exist:
+                        new_pieces += 1
+                        add_piece(piece)
+                    if not composer_exist:
+                        add_composer(composer)
+                        new_composers += 1
                 db.session.commit()
             print("\n\n")
         except Timeout:
