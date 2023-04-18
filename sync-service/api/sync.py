@@ -7,16 +7,13 @@ from .models import Title, Subtitle, Composer, Log, Piece, FullYear
 from . import db
 # from hashlib import md5
 import click
-import time
 
 bp = Blueprint('api', __name__, url_prefix="/api")
 
 
-# def hash_string(s: str) -> int:
-    # return int(md5(s.encode("UTF-8")).hexdigest(), 16) % 10 ** 8
-
-def hash_string(s: str)->int:
+def hash_string(s: str) -> int:
     return hash(s) % 10 ** 8
+
 
 def piece_exists(piece: dict) -> bool:
     """checks if piece exists in database"""
@@ -116,7 +113,6 @@ def update_database():
     print("Getting number of pages")
     num_pages = scraper.get_num_pages()
     print(f"Current number of pages is {num_pages}\n")
-    start_time = time.time()
     for i in range(num_pages):
         cur_page = i+1
         url = scraper.get_url(cur_page)
@@ -155,8 +151,6 @@ def update_database():
             print(f"An error occured on page {cur_page}")
             print(f"Error: \n {e}\n")
             continue
-    end_time = time.time()
-    print(end_time-start_time)
-    # add_log(new_composers, new_pieces)
+    add_log(new_composers, new_pieces)
     print("Database sync completed")
     db.session.close()
