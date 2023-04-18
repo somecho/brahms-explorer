@@ -1,6 +1,8 @@
-from .models import Piece, Composer, Log
+from .models import Piece, Composer, Log, Title, Subtitle, FullYear
 from flask import Blueprint, request
 from sqlalchemy import or_, and_
+from . import db
+
 
 bp = Blueprint("api", __name__, url_prefix="/api/")
 
@@ -32,11 +34,11 @@ def process_ascending(str):
 
 
 map_order_by = {
-    "title": Piece.title,
+    "title": Title.string,
     "lastName": Composer.last_name,
     "firstName": Composer.first_name,
-    "year": Piece.year_short,
-    "subtitle": Piece.subtitle
+    "year": Piece.year,
+    "subtitle": Subtitle.string
 }
 
 
@@ -48,24 +50,31 @@ def pieces():
         keywords = process_keywords(request.args.get("keywords"))
         order_by = request.args.get("orderBy") or "title"
         ascending = process_ascending(request.args.get("ascending"))
-        or_queries = [or_(Piece.title.contains(w),
-                          Piece.subtitle.contains(w),
-                          Piece.composer.contains(w),
-                          Piece.year_full.contains(w)) for w in keywords]
+        or_queries = [or_(Title.string.contains(w),
+                          Subtitle.string.contains(w),
+                          Composer.string.contains(w),
+                          FullYear.string.contains(w)) for w in keywords]
         order = (map_order_by[order_by]
                  if ascending
                  else map_order_by[order_by].desc())
-        results = (Piece.query
-                   .join(Composer, Piece.composer == Composer.full_name)
+        results = (db.session.query(Title.string,
+                                    Subtitle.string,
+                                    Composer.string,
+                                    FullYear.string)
+                   .select_from(Piece)
+                   .join(Composer, Piece.composer == Composer.id)
+                   .join(Title, Piece.title == Title.id)
+                   .join(Subtitle, Piece.subtitle == Subtitle.id)
+                   .join(FullYear, Piece.full_year == FullYear.id)
                    .filter(and_(*or_queries))
                    .order_by(order)
                    .limit(limit)
                    .offset(offset)
                    .all())
-        results = [dict(title=a.title,
-                        subtitle=a.subtitle,
-                        composer=a.composer,
-                        year=a.year_full) for a in results]
+        results = [dict(title=a[0],
+                        subtitle=a[1],
+                        composer=a[2],
+                        year=a[3]) for a in results]
         return results
 
 
