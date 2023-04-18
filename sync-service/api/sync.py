@@ -144,7 +144,6 @@ def update_database():
                         add_composer(composer)
                         new_composers += 1
                 db.session.commit()
-                p.decompose()
                 print("\n\n")
         except Exception as e:
             print(f"An error occured on page {cur_page}")

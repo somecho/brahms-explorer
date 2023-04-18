@@ -77,13 +77,12 @@ def get_duration(raw_text: str) -> int:
     return int(minutes) * 60 + int(seconds)
 
 
-def remove_span(tag: bs4.element.Tag) -> bs4.element.Tag:
+def remove_span(tag: bs4.element.Tag):
     """
     removes span tags from element
     """
     for s in tag.findAll("span"):
         s.decompose()
-    return tag
 
 
 def process_page(page: requests.Response) -> list[str]:
