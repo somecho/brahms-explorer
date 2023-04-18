@@ -5,14 +5,14 @@ from requests import Timeout
 from . import scraper
 from .models import Title, Subtitle, Composer, Log, Piece, FullYear
 from . import db
-# from hashlib import md5
+import hashlib
 import click
 
 bp = Blueprint('api', __name__, url_prefix="/api")
 
 
 def hash_string(s: str) -> int:
-    return hash(s) % 10 ** 8
+    return int(hashlib.sha1(str.encode("UTF-8")).hexdigest(),16) % 10**8
 
 
 def piece_exists(piece: dict) -> bool:
