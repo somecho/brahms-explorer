@@ -24,9 +24,6 @@ def create_app():
     with app.app_context():
         db.create_all()
 
-    from . import sync
-    app.register_blueprint(sync.bp)
-
     def clean_up(e=None):
         db.session.close()
 

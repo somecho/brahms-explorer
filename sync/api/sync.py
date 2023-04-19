@@ -1,5 +1,4 @@
 from __future__ import annotations
-from flask import (Blueprint, request, copy_current_request_context)
 import requests
 from requests import Timeout
 from MySQLdb import OperationalError
@@ -8,8 +7,6 @@ from .models import Title, Subtitle, Composer, Log, Piece, FullYear
 from . import db
 from hashlib import md5
 import click
-
-bp = Blueprint('api', __name__, url_prefix="/api")
 
 
 def hash_string(s: str) -> int:
