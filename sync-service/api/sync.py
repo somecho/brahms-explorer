@@ -2,6 +2,7 @@ from __future__ import annotations
 from flask import (Blueprint, request, copy_current_request_context)
 import requests
 from requests import Timeout
+from MySQLdb import OperationalError
 from . import scraper
 from .models import Title, Subtitle, Composer, Log, Piece, FullYear
 from . import db
@@ -147,6 +148,9 @@ def update_database():
                         new_composers += 1
                 db.session.commit()
             print("\n\n")
+        except OperationalError:
+            db.session.rollback()
+            continue
         except Timeout:
             print(f"timeout on page {cur_page}\n")
             continue
