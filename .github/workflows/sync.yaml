@@ -15,7 +15,7 @@ jobs:
           sudo apt-get update
           sudo apt-get -y install default-libmysqlclient-dev build-essential python3-pip
       - name: Install Dependencies
-        working-directory: sync-service
+        working-directory: sync
         run: |
           pip install -r requirements.txt
       - name: Synchronise Database
@@ -25,4 +25,4 @@ jobs:
           DATABASE: ${{secrets.DATABASE}}
           PASSWORD: ${{secrets.PASSWORD}}
         run: |
-          flask --app sync-service/api sync-db
+          flask --app sync/api sync-db
