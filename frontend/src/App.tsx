@@ -12,7 +12,7 @@ import {
 import Catalog from "./components/Catalog";
 import { Route, Routes, Link as ReactLink } from "react-router-dom";
 
-function About() {
+function About(): JSX.Element {
 	return (
 		<Container my="2em">
 			<Text>
