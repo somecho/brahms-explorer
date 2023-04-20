@@ -10,6 +10,7 @@ import {
 	Text,
 } from "@chakra-ui/react";
 import Catalog from "./components/Catalog";
+import Header from "./components/header/Header";
 import { Route, Routes, Link as ReactLink } from "react-router-dom";
 
 function About(): JSX.Element {
@@ -90,6 +91,7 @@ function App() {
 	return (
 		<ChakraProvider>
 			<div className="App">
+			<Header />
 				<Center>
 					<Heading
 						as="h1"
