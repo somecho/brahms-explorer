@@ -3,6 +3,7 @@ import { Box } from "@chakra-ui/react";
 import Title from "./Title";
 import Subtitle from "./Subtitle";
 import Navigation from "../navigation/Navigation";
+import Stats from "../Stats";
 
 
 interface HeaderProps { }
@@ -18,6 +19,7 @@ const Header: FC<HeaderProps> = () =>
 			<Navigation />
 			<Title />
 			<Subtitle />
+			<Stats />
 		</header>
 	</Box>
 )
