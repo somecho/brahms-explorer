@@ -18,11 +18,11 @@ def piece_exists(piece: dict) -> bool:
     title_exist = (db.session
                    .query(Title.id)
                    .filter_by(id=hash_string(piece["title"]))
-                   .count())
+                   .first())
     subtitle_exist = (db.session
                       .query(Subtitle.id)
                       .filter_by(id=hash_string(piece["subtitle"]))
-                      .count())
+                      .first())
     return True if title_exist and subtitle_exist else False
 
 
@@ -31,7 +31,7 @@ def composer_exists(composer: dict) -> bool:
     result = (db.session
               .query(Composer.id)
               .filter_by(id=hash_string(composer["full_name"]))
-              .count())
+              .first())
     return True if result else False
 
 
@@ -147,6 +147,7 @@ def update_database():
             print("\n\n")
         except OperationalError:
             db.session.rollback()
+            print("Operational error encountered. Session rolled back.")
             continue
         except Timeout:
             print(f"timeout on page {cur_page}\n")
