@@ -92,34 +92,6 @@ function App() {
 		<ChakraProvider>
 			<div className="App">
 			<Header />
-				<Center>
-					<Heading
-						as="h1"
-						size="2xl"
-						p="0.5em"
-						textAlign={["center", "left"]}
-						bgGradient="linear(to-l,orange.300,red.400)"
-						fontWeight="extrabold"
-						bgClip="text"
-					>
-						The B.R.A.H.M.S. Explorer
-					</Heading>
-					<Show above="sm">
-						<PageSubheader padding="0.5em" align="left" />
-					</Show>
-				</Center>
-				<Show below="sm">
-					<Center>
-						<PageSubheader align="center" />
-					</Center>
-				</Show>
-				<Center>
-					<Text textAlign="center" m="0.5em" fontSize="xs" color="gray.400">
-						This database was last updated on {lastUpdated}.{" "}
-						{newPieces} new pieces and {newComposers}{" "}
-						new composers were added.
-					</Text>
-				</Center>
 				<Routes>
 					<Route path="/" element={<Catalog />}></Route>
 					<Route path="/about" element={<About />}></Route>
