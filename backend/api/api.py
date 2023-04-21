@@ -7,6 +7,12 @@ from . import db
 bp = Blueprint("api", __name__, url_prefix="/api/")
 
 
+@bp.route("/composers/count")
+def composers_count():
+    count = db.session.query(Composer.id).count()
+    return {'size': count}
+
+
 @bp.route("/pieces/count")
 def pieces_count():
     keywords = process_keywords(request.args.get("keywords"))
