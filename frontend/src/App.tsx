@@ -37,7 +37,7 @@ function About(): JSX.Element {
 				</Link>
 				. The source code can be found{" "}
 				<Link
-					href="https://github.com/somecho/catalog-for-contemporary-music"
+					href="https://github.com/somecho/brahms-explorer"
 					color="blue.600"
 					target="_blank"
 				>
