@@ -120,19 +120,6 @@ function App() {
 						new composers were added.
 					</Text>
 				</Center>
-				<nav>
-					<Center>
-						<Stack direction="row">
-							<Link as={ReactLink} to="/about" color="blue.600">
-								about
-							</Link>
-							<Text>/</Text>
-							<Link as={ReactLink} to="/" color="blue.600">
-								search
-							</Link>
-						</Stack>
-					</Center>
-				</nav>
 				<Routes>
 					<Route path="/" element={<Catalog />}></Route>
 					<Route path="/about" element={<About />}></Route>

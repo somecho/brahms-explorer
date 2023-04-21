@@ -2,6 +2,7 @@ import { FC } from "react"
 import { Box } from "@chakra-ui/react";
 import Title from "./Title";
 import Subtitle from "./Subtitle";
+import Navigation from "../navigation/Navigation";
 
 
 interface HeaderProps { }
@@ -14,6 +15,7 @@ const Header: FC<HeaderProps> = () =>
 		py="5vh"
 	>
 		<header>
+			<Navigation />
 			<Title />
 			<Subtitle />
 		</header>

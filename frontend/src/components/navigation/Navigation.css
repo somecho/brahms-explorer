@@ -1,0 +1,16 @@
+#site-nav li {
+	list-style: none;
+	color: white;
+	font-size: 16px;
+	padding-left: 1em;
+}
+
+#site-nav ul {
+	display: flex;
+}
+
+#site-nav {
+	position: absolute;
+	right: 3vw;
+	top: 5vh;
+}
