@@ -10,9 +10,10 @@ import {
 	Text,
 } from "@chakra-ui/react";
 import Catalog from "./components/Catalog";
+import Header from "./components/header/Header";
 import { Route, Routes, Link as ReactLink } from "react-router-dom";
 
-function About() {
+function About(): JSX.Element {
 	return (
 		<Container my="2em">
 			<Text>
@@ -36,7 +37,7 @@ function About() {
 				</Link>
 				. The source code can be found{" "}
 				<Link
-					href="https://github.com/somecho/catalog-for-contemporary-music"
+					href="https://github.com/somecho/brahms-explorer"
 					color="blue.600"
 					target="_blank"
 				>
@@ -90,47 +91,7 @@ function App() {
 	return (
 		<ChakraProvider>
 			<div className="App">
-				<Center>
-					<Heading
-						as="h1"
-						size="2xl"
-						p="0.5em"
-						textAlign={["center", "left"]}
-						bgGradient="linear(to-l,orange.300,red.400)"
-						fontWeight="extrabold"
-						bgClip="text"
-					>
-						The B.R.A.H.M.S. Explorer
-					</Heading>
-					<Show above="sm">
-						<PageSubheader padding="0.5em" align="left" />
-					</Show>
-				</Center>
-				<Show below="sm">
-					<Center>
-						<PageSubheader align="center" />
-					</Center>
-				</Show>
-				<Center>
-					<Text textAlign="center" m="0.5em" fontSize="xs" color="gray.400">
-						This database was last updated on {lastUpdated}.{" "}
-						{newPieces} new pieces and {newComposers}{" "}
-						new composers were added.
-					</Text>
-				</Center>
-				<nav>
-					<Center>
-						<Stack direction="row">
-							<Link as={ReactLink} to="/about" color="blue.600">
-								about
-							</Link>
-							<Text>/</Text>
-							<Link as={ReactLink} to="/" color="blue.600">
-								search
-							</Link>
-						</Stack>
-					</Center>
-				</nav>
+			<Header />
 				<Routes>
 					<Route path="/" element={<Catalog />}></Route>
 					<Route path="/about" element={<About />}></Route>

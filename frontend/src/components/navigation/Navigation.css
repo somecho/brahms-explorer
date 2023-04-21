@@ -1,0 +1,25 @@
+#site-nav li {
+	list-style: none;
+	color: white;
+	font-size: 16px;
+	padding-left: 1em;
+	margin-bottom: 3vh;
+}
+
+#site-nav ul {
+	display: flex;
+}
+
+@media only screen and (min-width: 480px){
+	#site-nav {
+		position: absolute;
+		right: 3vw;
+		top: 6vh;
+	}
+}
+
+@media only screen and (max-width: 480px){
+	#site-nav ul {
+		justify-content: flex-end;
+	}
+}
