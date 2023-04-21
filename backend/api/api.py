@@ -7,6 +7,14 @@ from . import db
 bp = Blueprint("api", __name__, url_prefix="/api/")
 
 
+@bp.route("/handshake")
+def handshake():
+    """Sometimes the webservice has to go through a cold startup.
+    Apps should call this endpoint at the beginning to verify
+    connection."""
+    return {"connected": True}
+
+
 @bp.route("/composers/count")
 def composers_count():
     count = db.session.query(Composer.id).count()
