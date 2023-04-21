@@ -32,7 +32,7 @@ const Stats = () => {
 		<Box
 			color="white"
 			pt="3vh"
-			fontSize="sm"
+			fontSize={["xs","sm"]}
 			fontWeight="light"
 			fontStyle="italic">
 			<Text>

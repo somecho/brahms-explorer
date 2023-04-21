@@ -7,7 +7,7 @@ const Subtitle: FC<SubtitleProps> = () => {
 	return (
 		<Heading
 			as="h2"
-			fontSize="2xl"
+			fontSize={["md","2xl"]}
 			color="white"
 			my="1vh"
 		>
