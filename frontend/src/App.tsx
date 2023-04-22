@@ -12,6 +12,15 @@ import {
 import Catalog from "./components/Catalog";
 import Header from "./components/header/Header";
 import { Route, Routes, Link as ReactLink } from "react-router-dom";
+import { extendTheme } from "@chakra-ui/react";
+import "./fonts.css"
+
+const theme = extendTheme({
+	fonts: {
+		heading: `'Inter'`,
+		body: `'Inter'`
+	}
+})
 
 function About(): JSX.Element {
 	return (
@@ -89,9 +98,9 @@ function App() {
 
 
 	return (
-		<ChakraProvider>
+		<ChakraProvider theme={theme}>
 			<div className="App">
-			<Header />
+				<Header />
 				<Routes>
 					<Route path="/" element={<Catalog />}></Route>
 					<Route path="/about" element={<About />}></Route>

@@ -17,7 +17,7 @@ const SearchBar = (props) => {
   const [keywords, setKeywords] = useState(props.queryParams.keywords.replace(',',' ') || "");
 
   return (
-    <Container p="0.5em">
+    <Container p="0.5em" my="1em">
       <Center p="0.2em">
         <FormControl py='0.25em'>
           <Flex >
