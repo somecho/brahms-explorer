@@ -1,7 +1,5 @@
 import InfiniteScroll from "react-infinite-scroll-component";
 import { Center, Container, Show, Text } from "@chakra-ui/react";
-import CatalogTableMobile from "./CatalogTableMobile";
-import CatalogTableFull from "./CatalogTableFull";
 import PieceCard from "./catalog/PieceCard";
 
 const CatalogTable = (props) => {
@@ -16,16 +14,6 @@ const CatalogTable = (props) => {
 					<Container maxW="container.md">
 						{props.pieces.map(p => <PieceCard piece={p} />)}
 					</Container>
-					{/*
-					<Container maxW="container.xl">
-						<Show above="sm">
-							<CatalogTableFull pieces={props.pieces} resultsSize={props.resultsSize} />
-						</Show>
-						<Show below="sm">
-							<CatalogTableMobile pieces={props.pieces} resultsSize={props.resultsSize} />
-						</Show>
-					</Container>
-*/}
 				</InfiniteScroll>
 			) : (
 				<Center>
