@@ -102,6 +102,7 @@ const Catalog = () => {
 			.then((res) => res.json())
 			.then((data) => {
 				setPieces(pieces.concat(data));
+				console.log(data)
 				setQueryParams({
 					...queryParams,
 					offset: queryParams.offset + data.length,
