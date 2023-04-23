@@ -17,7 +17,10 @@ const LoginButton: FC<LoginButtonProps> = ({ onLoginSuccess }) => {
 			document.cookie = `access_token=${codeResponse.access_token}`
 		},
 	})
-	return <Button onClick={() => googleLogin()}>Login</Button>
+	return <Button
+		my="2em"
+		colorScheme="messenger"
+		onClick={() => googleLogin()}>Login with Google</Button>
 }
 
 export default LoginButton;
