@@ -143,7 +143,7 @@ def update_database():
                     if not composer_exist:
                         add_composer(composer)
                         new_composers += 1
-                db.session.commit()
+                    db.session.commit()
             print("\n\n")
         except OperationalError:
             db.session.rollback()
