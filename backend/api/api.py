@@ -77,7 +77,8 @@ def pieces():
         results = (db.session.query(Title.string,
                                     Subtitle.string,
                                     Composer.string,
-                                    FullYear.string)
+                                    FullYear.string,
+                                    Piece.duration)
                    .select_from(Piece)
                    .join(Composer, Piece.composer == Composer.id)
                    .join(Title, Piece.title == Title.id)
@@ -91,7 +92,8 @@ def pieces():
         results = [dict(title=a[0],
                         subtitle=a[1],
                         composer=a[2],
-                        year=a[3]) for a in results]
+                        year=a[3],
+                        duration=a[4]) for a in results]
         return results
 
 
