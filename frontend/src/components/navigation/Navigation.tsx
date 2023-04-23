@@ -12,8 +12,7 @@ const Navigation: FC<NavigationProps> = () => {
 					<Link to="/about">about</Link>
 				</li>
 				<li>
-					{/* TODO: Change this link after implementing login*/}
-					<Link to="#">login</Link>
+					<Link to="/login">login</Link>
 				</li>
 			</ul>
 		</nav>
