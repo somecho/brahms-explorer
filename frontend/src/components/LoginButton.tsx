@@ -1,5 +1,6 @@
 import { Button } from "@chakra-ui/react";
 import { useGoogleLogin } from "@react-oauth/google";
+import { useNavigate } from "react-router-dom";
 import { FC } from "react"
 
 interface LoginButtonProps {
@@ -7,6 +8,8 @@ interface LoginButtonProps {
 }
 
 const LoginButton: FC<LoginButtonProps> = ({ onLoginSuccess }) => {
+	const navigate = useNavigate();
+
 	const googleLogin = useGoogleLogin({
 		onSuccess: async codeResponse => {
 			const userInfo = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
@@ -15,6 +18,7 @@ const LoginButton: FC<LoginButtonProps> = ({ onLoginSuccess }) => {
 			const data = await userInfo.json();
 			onLoginSuccess(data);
 			document.cookie = `access_token=${codeResponse.access_token}`
+			navigate("/")
 		},
 	})
 	return <Button
