@@ -1,50 +1,18 @@
-import CatalogTable from "./CatalogTable";
-import SearchBar from "./SearchBar";
-import { useState, useMemo } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import CatalogTable from "../CatalogTable";
+import SearchBar from "../search/SearchBar";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Center, Spinner } from "@chakra-ui/react";
-import { buildQueryString, queryAPI } from "../utils/api";
-import { Piece } from "../types/Piece";
-import { Button } from "../types/Button";
-import { Params } from "../types/Params";
-import { QueryResult } from "../types/QueryResult";
-import { Criteria } from "../types/Ordering";
+import { buildKeywordsQuery, buildQueryString, queryAPI } from "../../utils/api";
+import { Piece } from "../../types/Piece";
+import { Params } from "../../types/Params";
+import { QueryResult } from "../../types/QueryResult";
+import { Criteria } from "../../types/Ordering";
+import { useQuery } from "../../hooks/useQuery";
+import { orderButtons, sortButtons } from "../../types/Button";
 
-/**
- * Formats an array of words to be sent via URL query string
- * @param {String[]} arr An array of words (Strings)
- * @return {String} The words formatted into a no-space comma separated string
- */
-function buildKeywordsQuery(arr: string[]): string {
-	let query = "";
-	for (let i = 0; i < arr.length; i++) {
-		query += arr[i];
-		if (i !== arr.length - 1) {
-			query += ",";
-		}
-	}
-	return query;
-};
 
-const sortButtons: Button[] = [
-	{ text: "Title", field: "title" },
-	{ text: "Subtitle", field: "subtitle" },
-	{ text: "Composer first name", field: "firstName" },
-	{ text: "Composer last name", field: "lastName" },
-	{ text: "Year", field: "year" },
-];
-
-const orderButtons: Button[] = [
-	{ text: "asc", field: "true" },
-	{ text: "desc", field: "false" },
-];
-
-function useQuery() {
-	const { search } = useLocation();
-	return useMemo(() => new URLSearchParams(search), [search]);
-}
-
-const Catalog = () => {
+const Search = () => {
 	const [pieces, setPieces] = useState<Piece[]>([]);
 	const [catalogSize, setCatalogSize] = useState<number>(-1);
 	const query = useQuery();
@@ -87,9 +55,7 @@ const Catalog = () => {
 		setPieces([]);
 	};
 
-	// Get data from API and append to `pieces`
 	const queryCatalog = () => {
-		// let url = `${endpoint}/api/pieces?${buildQueryString(queryParams)}`;
 		queryAPI<Piece[]>('pieces', queryParams)
 			.then(data => {
 				setPieces(pieces.concat(data));
@@ -100,10 +66,7 @@ const Catalog = () => {
 			});
 	};
 
-	// Get size of search result from API and calls `setCatalogSize`
 	const queryResultsSize = () => {
-		// let url = `${endpoint}/api/pieces/count?${buildQueryString(queryParams)}`;
-		// fetch(url)
 		queryAPI<QueryResult>('pieces/count', queryParams)
 			.then((data) => { setCatalogSize(data.size as number) });
 	};
@@ -141,4 +104,4 @@ const Catalog = () => {
 		</>
 	);
 };
-export default Catalog;
+export default Search;

@@ -11,10 +11,10 @@ import {
 } from "@chakra-ui/react";
 import { FC, useState } from "react";
 import { SearchIcon } from "@chakra-ui/icons";
-import ButtonSelectPanel from "./search/ButtonSelectPanel";
-import { Button } from "../types/Button";
-import { Params } from "../types/Params";
-import { Ordering } from "../types/Ordering";
+import ButtonSelectPanel from "./ButtonSelectPanel";
+import { Button } from "../../types/Button";
+import { Params } from "../../types/Params";
+import { Ordering } from "../../types/Ordering";
 
 interface SearchBarProps {
 	queryParams: Params,
