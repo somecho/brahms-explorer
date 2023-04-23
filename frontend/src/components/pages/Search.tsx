@@ -1,17 +1,15 @@
 import Results from "../search/Results";
 import SearchBar from "../search/SearchBar";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-// import { Center, Spinner } from "@chakra-ui/react";
-import { buildKeywordsQuery, buildQueryString, queryAPI } from "../../utils/api";
-import { Piece } from "../../types/Piece";
-import { Params } from "../../types/Params";
-import { QueryResult } from "../../types/QueryResult";
-import { Criteria } from "../../types/Ordering";
-import { useQuery } from "../../hooks/useQuery";
-import { orderButtons, sortButtons } from "../../types/Button";
 import Spinner from "../search/Spinner";
-
+import { Criteria } from "../../types/Ordering";
+import { Params } from "../../types/Params";
+import { Piece } from "../../types/Piece";
+import { QueryResult } from "../../types/QueryResult";
+import { buildKeywordsQuery, buildQueryString, queryAPI } from "../../utils/api";
+import { orderButtons, sortButtons } from "../../types/Button";
+import { useNavigate } from "react-router-dom";
+import { useQuery } from "../../hooks/useQuery";
+import { useState } from "react";
 
 const Search = () => {
 	const [pieces, setPieces] = useState<Piece[]>([]);

@@ -25,7 +25,7 @@ function App() {
 			<div className="App">
 				<Header />
 				<Routes>
-					<Route path="/" element={<Search />}></Route>
+					<Route path="/" element={<Search appData={appData}/>}></Route>
 					<Route path="/about" element={<About />}></Route>
 					<Route path="/login" element={<Login onLoginSuccess={onLoginSuccess} />}></Route>
 				</Routes>
