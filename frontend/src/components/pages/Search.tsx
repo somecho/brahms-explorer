@@ -1,8 +1,8 @@
-import CatalogTable from "../CatalogTable";
+import Results from "../search/Results";
 import SearchBar from "../search/SearchBar";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Center, Spinner } from "@chakra-ui/react";
+// import { Center, Spinner } from "@chakra-ui/react";
 import { buildKeywordsQuery, buildQueryString, queryAPI } from "../../utils/api";
 import { Piece } from "../../types/Piece";
 import { Params } from "../../types/Params";
@@ -10,6 +10,7 @@ import { QueryResult } from "../../types/QueryResult";
 import { Criteria } from "../../types/Ordering";
 import { useQuery } from "../../hooks/useQuery";
 import { orderButtons, sortButtons } from "../../types/Button";
+import Spinner from "../search/Spinner";
 
 
 const Search = () => {
@@ -88,19 +89,14 @@ const Search = () => {
 				resultsSize={catalogSize}
 				isLoading={pieces.length === 0 && catalogSize !== 0}
 			/>
-			{pieces.length === 0 && catalogSize !== 0 ? (
-				<Center>
-					<Spinner color="red.500" size="lg" />
-				</Center>
-			) : (
-				<CatalogTable
-					next={queryCatalog}
-					resultsSize={catalogSize}
-					hasMore={pieces.length !== catalogSize}
-					isLoading={pieces.length === 0 && catalogSize !== 0}
-					pieces={pieces}
-				/>
-			)}
+			<Spinner isLoading={pieces.length === 0 && catalogSize !== 0} />
+			<Results
+				next={queryCatalog}
+				resultsSize={catalogSize}
+				hasMore={pieces.length !== catalogSize}
+				isLoading={pieces.length === 0 && catalogSize !== 0}
+				pieces={pieces}
+			/>
 		</>
 	);
 };
