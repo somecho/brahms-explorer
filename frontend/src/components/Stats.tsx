@@ -1,6 +1,7 @@
 import { Box, Text } from "@chakra-ui/react"
 import { queryAPI } from "../utils/api";
 import { useState } from "react";
+import { QueryResult } from "../types/QueryResult";
 
 type Stat = number | string
 
@@ -20,9 +21,9 @@ const Stats = () => {
 	const [lastUpdated, setLastUpdated] = useState<Stat>("...")
 
 
-	queryAPI("pieces/count").then(r => setTotalPieces(r.size as number))
-	queryAPI("composers/count").then(r => setTotalComposers(r.size as number))
-	queryAPI("last-updated").then(r => {
+	queryAPI<QueryResult>("pieces/count").then(r => setTotalPieces(r.size as number))
+	queryAPI<QueryResult>("composers/count").then(r => setTotalComposers(r.size as number))
+	queryAPI<QueryResult>("last-updated").then(r => {
 		setNewComposers(r.newComposers as number)
 		setNewPieces(r.newPieces as number)
 		setLastUpdated(timestampToDatestring(r.timestamp as string))
@@ -32,7 +33,7 @@ const Stats = () => {
 		<Box
 			color="white"
 			pt="3vh"
-			fontSize={["xs","sm"]}
+			fontSize={["xs", "sm"]}
 			fontWeight="light"
 			fontStyle="italic">
 			<Text>

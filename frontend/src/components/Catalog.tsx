@@ -3,27 +3,19 @@ import SearchBar from "./SearchBar";
 import { useState, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Center, Spinner } from "@chakra-ui/react";
-
-const endpoint = "https://brahms-crud.onrender.com"
-/**
- * Creates a query string which can be appended to a URL
- * @param {Object} params An object of keys and value to be turned into a query string
- * @return {String} the resulting query string
- */
-const buildQueryString = (params) => {
-	let queryParams = new URLSearchParams();
-	Object.keys(params).forEach((key) => {
-		queryParams.append(key, params[key]);
-	});
-	return queryParams.toString();
-};
+import { buildQueryString, queryAPI } from "../utils/api";
+import { Piece } from "../types/Piece";
+import { Button } from "../types/Button";
+import { Params } from "../types/Params";
+import { QueryResult } from "../types/QueryResult";
+import { Criteria } from "../types/Ordering";
 
 /**
  * Formats an array of words to be sent via URL query string
- * @param {Array} arr An array of words (Strings)
+ * @param {String[]} arr An array of words (Strings)
  * @return {String} The words formatted into a no-space comma separated string
  */
-const buildKeywordsQuery = (arr) => {
+function buildKeywordsQuery(arr: string[]): string {
 	let query = "";
 	for (let i = 0; i < arr.length; i++) {
 		query += arr[i];
@@ -34,7 +26,7 @@ const buildKeywordsQuery = (arr) => {
 	return query;
 };
 
-const sortButtons = [
+const sortButtons: Button[] = [
 	{ text: "Title", field: "title" },
 	{ text: "Subtitle", field: "subtitle" },
 	{ text: "Composer first name", field: "firstName" },
@@ -42,7 +34,7 @@ const sortButtons = [
 	{ text: "Year", field: "year" },
 ];
 
-const orderButtons = [
+const orderButtons: Button[] = [
 	{ text: "asc", field: "true" },
 	{ text: "desc", field: "false" },
 ];
@@ -53,13 +45,13 @@ function useQuery() {
 }
 
 const Catalog = () => {
-	const [pieces, setPieces] = useState([]);
-	const [catalogSize, setCatalogSize] = useState([]);
+	const [pieces, setPieces] = useState<Piece[]>([]);
+	const [catalogSize, setCatalogSize] = useState<number>(-1);
 	const query = useQuery();
 	const navigate = useNavigate();
-	window.onpopstate = (e) => navigate(0);
+	window.onpopstate = (_) => navigate(0);
 
-	const [queryParams, setQueryParams] = useState({
+	const [queryParams, setQueryParams] = useState<Params>({
 		orderBy: "title",
 		ascending: true,
 		limit: 100,
@@ -67,12 +59,12 @@ const Catalog = () => {
 		keywords: query.get("keywords") || "",
 	});
 
-	const setSort = (orderBy) => {
+	const setSort = (orderBy: Criteria) => {
 		setQueryParams({ ...queryParams, offset: 0, orderBy });
 		setPieces([]);
 	};
 
-	const setOrder = (ascending) => {
+	const setOrder = (ascending: Criteria) => {
 		setQueryParams({ ...queryParams, offset: 0, ascending });
 		setPieces([]);
 	};
@@ -86,35 +78,34 @@ const Catalog = () => {
 	 * It then clears the pieces cache too force a rerender.
 	 *
 	 * */
-	const handleSearch = (keywords) => {
-		keywords = keywords.split(" ").filter((s) => s !== "");
-		const formattedKeywords = buildKeywordsQuery(keywords);
+	function handleSearch(keywords: string) {
+		const kw: string[] = keywords.split(" ").filter((s) => s !== "");
+		const formattedKeywords = buildKeywordsQuery(kw);
 		setQueryParams({ ...queryParams, offset: 0, keywords: formattedKeywords });
-		const url = keywords.length ? `/?${buildQueryString({ keywords })}` : "/";
+		const url = keywords.length ? `/?${buildQueryString(queryParams)}` : "/";
 		navigate(url);
 		setPieces([]);
 	};
 
 	// Get data from API and append to `pieces`
 	const queryCatalog = () => {
-		let url = `${endpoint}/api/pieces?${buildQueryString(queryParams)}`;
-		fetch(url)
-			.then((res) => res.json())
-			.then((data) => {
+		// let url = `${endpoint}/api/pieces?${buildQueryString(queryParams)}`;
+		queryAPI<Piece[]>('pieces', queryParams)
+			.then(data => {
 				setPieces(pieces.concat(data));
 				setQueryParams({
 					...queryParams,
-					offset: queryParams.offset + data.length,
+					offset: queryParams.offset as number + data.length,
 				});
 			});
 	};
 
 	// Get size of search result from API and calls `setCatalogSize`
 	const queryResultsSize = () => {
-		let url = `${endpoint}/api/pieces/count?${buildQueryString(queryParams)}`;
-		fetch(url)
-			.then((res) => res.json())
-			.then((data) => { setCatalogSize(data.size) });
+		// let url = `${endpoint}/api/pieces/count?${buildQueryString(queryParams)}`;
+		// fetch(url)
+		queryAPI<QueryResult>('pieces/count', queryParams)
+			.then((data) => { setCatalogSize(data.size as number) });
 	};
 
 	if (pieces.length === 0 && catalogSize !== 0) {

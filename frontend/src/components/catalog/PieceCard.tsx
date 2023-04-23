@@ -1,13 +1,7 @@
 import { FC } from 'react'
 import { Card, CardBody, Heading, Text } from '@chakra-ui/react'
+import { Piece } from '../../types/Piece';
 
-interface Piece {
-	title: string,
-	subtitle: string,
-	composer: string,
-	year: string,
-	duration: number
-}
 
 interface PieceCardProps {
 	piece: Piece
