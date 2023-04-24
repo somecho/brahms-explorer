@@ -3,5 +3,6 @@ export interface Piece {
 	subtitle: string,
 	composer: string,
 	year: string,
-	duration: number
+	duration: number,
+	id: number
 }

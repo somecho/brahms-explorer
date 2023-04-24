@@ -12,7 +12,7 @@ interface ResultProps {
 	pieces: Piece[]
 }
 
-const Results:FC<ResultProps> = (props: ResultProps) => {
+const Results: FC<ResultProps> = (props: ResultProps) => {
 	return (
 		<>
 			{
@@ -23,7 +23,7 @@ const Results:FC<ResultProps> = (props: ResultProps) => {
 					hasMore={props.hasMore}
 				>
 					<Container maxW="container.md">
-						{props.pieces.map(p => <PieceCard piece={p} />)}
+						{props.pieces.map(p => <PieceCard piece={p} key={p.id} />)}
 					</Container>
 				</InfiniteScroll>
 			}

@@ -21,7 +21,7 @@ const Search = () => {
 	const [queryParams, setQueryParams] = useState<Params>({
 		orderBy: "title",
 		ascending: true,
-		limit: 100,
+		limit: 10,
 		offset: 0,
 		keywords: query.get("keywords") || "",
 	});
