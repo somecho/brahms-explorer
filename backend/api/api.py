@@ -2,6 +2,7 @@ from .models import Piece, Composer, Log, Title, Subtitle, FullYear
 from flask import Blueprint, request
 from sqlalchemy import or_, and_, func
 from . import db
+from . import cache
 
 
 bp = Blueprint("api", __name__, url_prefix="/api/")
@@ -15,12 +16,14 @@ def handshake():
     return {"connected": True}
 
 
+@cache.cached()
 @bp.route("/composers/count")
 def composers_count():
     count = db.session.query(Composer.id).count()
     return {'size': count}
 
 
+@cache.cached()
 @bp.route("/pieces/count")
 def pieces_count():
     keywords = process_keywords(request.args.get("keywords"))
@@ -39,9 +42,11 @@ def pieces_count():
 
 
 def process_keywords(keywords):
-    k = keywords or ""
-    keywords_array = k.split(",")
-    return keywords_array
+    if keywords:
+        k = keywords or ""
+        keywords_array = k.split(",")
+        return keywords_array
+    return []
 
 
 def process_ascending(str):
@@ -65,6 +70,7 @@ map_order_by = {
 }
 
 
+@cache.cached()
 @bp.route("/pieces", methods=["POST", "GET"])
 def pieces():
     if request.method == "GET":
@@ -91,8 +97,10 @@ def pieces():
                  .join(Composer, Piece.composer == Composer.id)
                  .join(Title, Piece.title == Title.id)
                  .join(Subtitle, Piece.subtitle == Subtitle.id)
-                 .join(FullYear, Piece.full_year == FullYear.id)
-                 .filter(and_(*or_queries))
+                 .join(FullYear, Piece.full_year == FullYear.id))
+        if keywords:
+            query = query.filter(and_(*or_queries))
+        query = (query
                  .order_by(order)
                  .limit(limit)
                  .offset(offset))
@@ -108,6 +116,7 @@ def pieces():
         return {"results": results}
 
 
+@cache.cached()
 @bp.route("/last-updated")
 def last_updated():
     result = Log.query.order_by(Log.timestamp.desc()).first()

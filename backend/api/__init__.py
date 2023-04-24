@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
+from flask_caching import Cache
 import os
 
 load_dotenv()
@@ -13,6 +14,8 @@ CERT = "/etc/ssl/certs/ca-certificates.crt"
 database_uri = f"mysql://{USERNAME}:{PASSWORD}@{HOST}/{DATABASE}?ssl_ca={CERT}"
 
 db: SQLAlchemy = SQLAlchemy()
+cache = Cache(config={'CACHE_TYPE': 'SimpleCache',
+                      'CACHE_DEFAULT_TIMEOUT': 300})
 
 
 def create_app():
@@ -20,6 +23,7 @@ def create_app():
     CORS(app)
     app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
     app.config['JSON_AS_ASCII'] = False
+    cache.init_app(app)
 
     db.init_app(app)
     with app.app_context():
