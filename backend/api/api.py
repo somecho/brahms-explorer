@@ -78,7 +78,8 @@ def pieces():
                                     Subtitle.string,
                                     Composer.string,
                                     FullYear.string,
-                                    Piece.duration)
+                                    Piece.duration,
+                                    Piece.id)
                    .select_from(Piece)
                    .join(Composer, Piece.composer == Composer.id)
                    .join(Title, Piece.title == Title.id)
@@ -93,7 +94,8 @@ def pieces():
                         subtitle=a[1],
                         composer=a[2],
                         year=a[3],
-                        duration=a[4]) for a in results]
+                        duration=a[4],
+                        id=a[5]) for a in results]
         return results
 
 
