@@ -10,6 +10,7 @@ import { orderButtons, sortButtons } from "../../types/Button";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "../../hooks/useQuery";
 import { useState } from "react";
+import { Container, Text } from "@chakra-ui/react";
 
 const Search = () => {
 	const [pieces, setPieces] = useState<Piece[]>([]);
@@ -88,6 +89,11 @@ const Search = () => {
 				isLoading={pieces.length === 0 && catalogSize !== 0}
 			/>
 			<Spinner isLoading={pieces.length === 0 && catalogSize !== 0} />
+			<Container maxW="container.md">
+				{pieces.length !== 0 && catalogSize > 0 &&
+					<Text fontSize="xs" color="gray.300">{catalogSize} Results</Text>
+				}
+			</Container>
 			<Results
 				next={queryCatalog}
 				resultsSize={catalogSize}
