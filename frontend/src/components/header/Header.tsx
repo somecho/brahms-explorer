@@ -6,17 +6,18 @@ import Navigation from "../navigation/Navigation";
 import Stats from "../Stats";
 
 
-interface HeaderProps { }
+interface HeaderProps {
+}
 
 const Header: FC<HeaderProps> = () =>
 (
 	<Box
 		bgGradient="linear(to-r,orange.300,red.500)"
 		px="3vw"
-		py={["2vh","5vh"]}
+		py={["2vh", "5vh"]}
 	>
 		<header>
-			<Navigation />
+			<Navigation/>
 			<Title />
 			<Subtitle />
 			<Stats />

@@ -5,7 +5,6 @@ export interface Button {
 	field: Criteria
 }
 
-
 export const sortButtons: Button[] = [
 	{ text: "Title", field: "title" },
 	{ text: "Subtitle", field: "subtitle" },
