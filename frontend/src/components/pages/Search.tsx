@@ -4,20 +4,29 @@ import Spinner from "../search/Spinner";
 import { Criteria } from "../../types/Ordering";
 import { Params } from "../../types/Params";
 import { Piece } from "../../types/Piece";
-import { QueryResult } from "../../types/QueryResult";
 import { buildKeywordsQuery, buildQueryString, queryAPI } from "../../utils/api";
 import { orderButtons, sortButtons } from "../../types/Button";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "../../hooks/useQuery";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Container, Text } from "@chakra-ui/react";
 
 const Search = () => {
 	const [pieces, setPieces] = useState<Piece[]>([]);
-	const [catalogSize, setCatalogSize] = useState<number>(-1);
+	const [resultsSize, setResultsSize] = useState<number>(-1);
+	const [useCount, setUseCount] = useState(true);
 	const query = useQuery();
 	const navigate = useNavigate();
 	window.onpopstate = (_) => navigate(0);
+	useEffect(() => {
+		// to prevent querying database for count each time a query is made
+		// since the endpoint of the server is the same
+		if (!pieces) {
+			setUseCount(false)
+		} else {
+			setUseCount(true)
+		}
+	}, [pieces])
 
 	const [queryParams, setQueryParams] = useState<Params>({
 		orderBy: "title",
@@ -56,24 +65,23 @@ const Search = () => {
 	};
 
 	const queryCatalog = () => {
-		queryAPI<Piece[]>('pieces', queryParams)
+		queryAPI<{
+			results: Piece[],
+			count?: number
+		}>
+			('pieces', { ...queryParams, count: useCount })
 			.then(data => {
-				setPieces(pieces.concat(data));
+				setResultsSize(data.count as number)
+				setPieces(pieces.concat(data.results as Piece[]));
 				setQueryParams({
 					...queryParams,
-					offset: queryParams.offset as number + data.length,
+					offset: queryParams.offset as number + data.results.length,
 				});
 			});
 	};
 
-	const queryResultsSize = () => {
-		queryAPI<QueryResult>('pieces/count', queryParams)
-			.then((data) => { setCatalogSize(data.size as number) });
-	};
-
-	if (pieces.length === 0 && catalogSize !== 0) {
+	if (pieces.length === 0 && resultsSize !== 0) {
 		queryCatalog();
-		queryResultsSize();
 	}
 
 	return (
@@ -85,20 +93,18 @@ const Search = () => {
 				order={orderButtons}
 				setSort={setSort}
 				setOrder={setOrder}
-				resultsSize={catalogSize}
-				isLoading={pieces.length === 0 && catalogSize !== 0}
+				isLoading={pieces.length === 0 && resultsSize !== 0}
 			/>
-			<Spinner isLoading={pieces.length === 0 && catalogSize !== 0} />
+			<Spinner isLoading={pieces.length === 0 && resultsSize !== 0} />
 			<Container maxW="container.md">
-				{pieces.length !== 0 && catalogSize > 0 &&
-					<Text fontSize="xs" color="gray.300">{catalogSize} Results</Text>
+				{pieces.length !== 0 && resultsSize > 0 &&
+					<Text fontSize="xs" color="gray.300">{resultsSize} Results</Text>
 				}
 			</Container>
 			<Results
 				next={queryCatalog}
-				resultsSize={catalogSize}
-				hasMore={pieces.length !== catalogSize}
-				isLoading={pieces.length === 0 && catalogSize !== 0}
+				hasMore={pieces.length !== resultsSize}
+				isLoading={pieces.length === 0 && resultsSize !== 0}
 				pieces={pieces}
 			/>
 		</>

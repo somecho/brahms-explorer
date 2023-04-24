@@ -13,7 +13,6 @@ interface SearchBarProps {
 	order: Button[],
 	setSort: Ordering,
 	setOrder: Ordering,
-	resultsSize: number,
 	isLoading: boolean
 }
 

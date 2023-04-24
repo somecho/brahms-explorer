@@ -1,12 +1,11 @@
 import InfiniteScroll from "react-infinite-scroll-component";
-import { Center, Container, Show, Text } from "@chakra-ui/react";
+import { Center, Container, Text } from "@chakra-ui/react";
 import PieceCard from "../catalog/PieceCard";
 import { FC } from "react";
 import { Piece } from "../../types/Piece";
 
 interface ResultProps {
 	next: () => void,
-	resultsSize: number,
 	hasMore: boolean,
 	isLoading: boolean,
 	pieces: Piece[]

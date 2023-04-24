@@ -30,7 +30,7 @@ export function buildQueryString(params: Params ): string {
 }
 
 export async function queryAPI<T>(endpoint: string, params: Params = {}): Promise<T> {
-	const url = "https://brahms-crud.onrender.com";
+	const url = import.meta.env.PROD ? import.meta.env.VITE_PROD_ENDPOINT : import.meta.env.VITE_DEV_ENDPOINT;
 	return fetch(`${url}/api/${endpoint}?${buildQueryString(params)}`)
 		.then(res => res.json())
 }
