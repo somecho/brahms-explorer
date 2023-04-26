@@ -27,10 +27,22 @@ const Results: FC<ResultProps> = (props: ResultProps) => {
 				</InfiniteScroll>
 			}
 			{
-				!props.hasMore &&
+				!props.hasMore && !props.pieces &&
 				<Center>
 					<Text>No results found...</Text>
 				</Center>
+			}
+			{
+				!props.hasMore && props.pieces &&
+				<Container maxW="container.md">
+					<Text
+						color="gray.300"
+						fontSize="xs"
+						my="2em">
+						Can't find what you're looking for but you know
+						the piece exists? Please reach out!
+					</Text>
+				</Container>
 			}
 		</>
 	);

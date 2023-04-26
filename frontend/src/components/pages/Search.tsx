@@ -38,8 +38,11 @@ const Search = () => {
 		const url = keywords.length ? `/?${buildQueryString({
 			keywords: buildKeywordsQuery(kw)
 		})}` : "/";
-		setPieces([]);
-		navigate(url);
+		//prevent double searching
+		if (keywords != query.get("keywords")) {
+			setPieces([]);
+			navigate(url);
+		}
 	};
 
 	useEffect(() => {
@@ -58,7 +61,9 @@ const Search = () => {
 	const queryCatalog = (params: Params) => {
 		queryAPI<{ results: Piece[], count?: number }>('pieces', params)
 			.then(data => {
-				setResultsSize(data.count as number)
+				if (data.count) {
+					setResultsSize(data.count as number)
+				}
 				setPieces(pieces.concat(data.results as Piece[]));
 			});
 	};
@@ -85,7 +90,7 @@ const Search = () => {
 						orderBy: queryParams.orderBy,
 						ascending: queryParams.ascending,
 						limit: 10,
-						offset: pieces.length + 10,
+						offset: pieces.length,
 						keywords: query.get("keywords") || "",
 					})
 				}}
