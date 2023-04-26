@@ -1,9 +1,16 @@
 import { Box, Text } from "@chakra-ui/react"
 import { queryAPI } from "../utils/api";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { QueryResult } from "../types/QueryResult";
 
 type Stat = number | string
+interface Stats {
+	totalPieces: Stat,
+	totalComposers: Stat,
+	newComposers: Stat,
+	newPieces: Stat,
+	lastUpdated: Stat
+}
 
 function timestampToDatestring(timestamp: string): string {
 	const date = new Date(timestamp)
@@ -14,21 +21,32 @@ function timestampToDatestring(timestamp: string): string {
 	})
 }
 const Stats = () => {
-	const [totalComposers, setTotalComposers] = useState<Stat>("...");
-	const [totalPieces, setTotalPieces] = useState<Stat>("...");
-	const [newComposers, setNewComposers] = useState<Stat>("...");
-	const [newPieces, setNewPieces] = useState<Stat>("...");
-	const [lastUpdated, setLastUpdated] = useState<Stat>("...")
+	const [stats, setStats] = useState<Stats>({
+		totalPieces: "...",
+		totalComposers: "...",
+		newComposers: "...",
+		newPieces: "...",
+		lastUpdated: "..."
+	});
 
+	useEffect(() => {
+		Promise.all(
+			[
+				queryAPI<QueryResult>("pieces/count"),
+				queryAPI<QueryResult>("composers/count"),
+				queryAPI<QueryResult>("last-updated")
+			]).then(r => {
+				setStats({
+					totalPieces: r[0].size as number,
+					totalComposers: r[1].size as number,
+					newComposers: r[2].newComposers as number,
+					newPieces: r[2].newPieces as number,
+					lastUpdated: timestampToDatestring(r[2].timestamp as string)
+				})
+			})
+	}, [])
 
-	queryAPI<QueryResult>("pieces/count").then(r => setTotalPieces(r.size as number))
-	queryAPI<QueryResult>("composers/count").then(r => setTotalComposers(r.size as number))
-	queryAPI<QueryResult>("last-updated").then(r => {
-		setNewComposers(r.newComposers as number)
-		setNewPieces(r.newPieces as number)
-		setLastUpdated(timestampToDatestring(r.timestamp as string))
-	})
-
+	console.log("stats")
 	return (
 		<Box
 			color="white"
@@ -37,10 +55,10 @@ const Stats = () => {
 			fontWeight="light"
 			fontStyle="italic">
 			<Text>
-				A total of {totalPieces} pieces and {totalComposers} composers are in this database
+				A total of {stats.totalPieces} pieces and {stats.totalComposers} composers are in this database
 			</Text>
 			<Text>
-				{newPieces} pieces and {newComposers} new composers added since {lastUpdated}
+				{stats.newPieces} pieces and {stats.newComposers} new composers added since {stats.lastUpdated}
 			</Text>
 		</Box>
 	)
