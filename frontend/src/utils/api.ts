@@ -21,10 +21,12 @@ export function buildKeywordsQuery(arr: string[]): string {
  * @param {UrlParams} params An object of keys and value to be turned into a query string
  * @return {String} the resulting query string
  */
-export function buildQueryString(params: Params ): string {
+export function buildQueryString(params: Params): string {
 	let queryParams = new URLSearchParams();
 	Object.keys(params).forEach((key) => {
-		queryParams.append(key, params[key].toString());
+		if (params[key]) {
+			queryParams.append(key, params[key].toString());
+		}
 	});
 	return queryParams.toString();
 }
