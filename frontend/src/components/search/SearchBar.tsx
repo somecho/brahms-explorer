@@ -5,9 +5,9 @@ import ButtonSelectPanel from "./ButtonSelectPanel";
 import { Button } from "../../types/Button";
 import { Params } from "../../types/Params";
 import { Ordering } from "../../types/Ordering";
+import { useQuery } from "../../hooks/useQuery";
 
 interface SearchBarProps {
-	queryParams: Params,
 	onSearch: (keywords: string) => void;
 	sort: Button[],
 	order: Button[],
@@ -17,9 +17,11 @@ interface SearchBarProps {
 }
 
 const SearchBar: FC<SearchBarProps> = (props: SearchBarProps) => {
+	const query = useQuery();
+	const urlKeywords = query.get("keywords")
 	const [keywords, setKeywords] = useState(
-		(props.queryParams.keywords as string)
-			.replace(',', ' ') || "");
+		urlKeywords ? urlKeywords.replace(',', ' ') : ""
+	);
 
 	return (
 		<Container p="0.5em" my="1em">

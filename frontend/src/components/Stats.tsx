@@ -46,7 +46,6 @@ const Stats = () => {
 			})
 	}, [])
 
-	console.log("stats")
 	return (
 		<Box
 			color="white"
