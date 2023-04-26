@@ -24,12 +24,12 @@ const Search = () => {
 	});
 
 	const setSort = (orderBy: Criteria) => {
-		setQueryParams({ ...queryParams, offset: 0, orderBy });
+		setQueryParams({ ...queryParams, orderBy });
 		setPieces([]);
 	};
 
 	const setOrder = (ascending: Criteria) => {
-		setQueryParams({ ...queryParams, offset: 0, ascending });
+		setQueryParams({ ...queryParams, ascending });
 		setPieces([]);
 	};
 
