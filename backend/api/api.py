@@ -16,14 +16,14 @@ def handshake():
     return {"connected": True}
 
 
-@cache.cached()
+@cache.cached(timeout=604800)
 @bp.route("/composers/count")
 def composers_count():
     count = db.session.query(Composer.id).count()
     return {'size': count}
 
 
-@cache.cached()
+@cache.cached(timeout=604800)
 @bp.route("/pieces/count")
 def pieces_count():
     keywords = process_keywords(request.args.get("keywords"))
@@ -70,7 +70,7 @@ map_order_by = {
 }
 
 
-@cache.cached()
+@cache.cached(timeout=604800, query_string=True)
 @bp.route("/pieces", methods=["POST", "GET"])
 def pieces():
     if request.method == "GET":
@@ -116,7 +116,7 @@ def pieces():
         return {"results": results}
 
 
-@cache.cached()
+@cache.cached(timeout=604800)
 @bp.route("/last-updated")
 def last_updated():
     result = Log.query.order_by(Log.timestamp.desc()).first()
