@@ -1,6 +1,8 @@
 import { FC } from 'react'
-import { Card, CardBody, Heading, Text } from '@chakra-ui/react'
+import { Card, CardBody, Heading, Text, Button, ButtonGroup, Flex } from '@chakra-ui/react'
 import { Piece } from '../../types/Piece';
+import { DeleteIcon, EditIcon } from '@chakra-ui/icons';
+import { getCookie } from 'react-use-cookie';
 
 
 interface PieceCardProps {
@@ -14,6 +16,7 @@ function formatDuration(seconds: number): string {
 }
 
 const PieceCard: FC<PieceCardProps> = ({ piece }) => {
+	const user = getCookie("currentUser");
 	return (
 		<Card variant="outline" my="0.5em">
 			<CardBody p="1em">
@@ -26,14 +29,28 @@ const PieceCard: FC<PieceCardProps> = ({ piece }) => {
 				<Text>
 					{piece.composer}
 				</Text>
-				<Text>
-					{piece.year}
-				</Text>
-				{piece.duration !== 0 &&
-					<Text>
-						{formatDuration(piece.duration)}
-					</Text>
-				}
+				<Flex justify="space-between" align="flex-end">
+					<div>
+						<Text>
+							{piece.year}
+						</Text>
+						{piece.duration !== 0 &&
+							<Text>
+								{formatDuration(piece.duration)}
+							</Text>
+						}
+					</div>
+					{user &&
+						<ButtonGroup padding="0">
+							<Button size="xs" variant="ghost" p="0" colorScheme='red'>
+								<DeleteIcon />
+							</Button>
+							<Button size="xs" variant="ghost" p="0" colorScheme='gray'>
+								<EditIcon />
+							</Button>
+						</ButtonGroup>
+					}
+				</Flex>
 			</CardBody>
 		</Card>
 	)
