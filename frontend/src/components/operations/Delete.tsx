@@ -5,17 +5,29 @@ import { getCookie } from "react-use-cookie"
 import { getUrl } from "../../utils/api"
 import { Piece } from "../../types/Piece"
 
-function del(accessToken: string, onDelete: () => void) {
+function checkIsAdmin() {
 	const url = getUrl()
-	fetch(`${url}/api/isAdmin`, {
+	return fetch(`${url}/api/isAdmin`, {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json"
 		},
-		body: JSON.stringify({ accessToken })
+		body: JSON.stringify({ accessToken: getCookie("access_token") })
 	})
-		.then(res => res.json())
-		.then(data => onDelete())
+}
+
+function deletePiece(accessToken: string, onDelete: () => void) {
+	onDelete()
+	// const url = getUrl()
+	// fetch(`${url}/api/isAdmin`, {
+	// 	method: "POST",
+	// 	headers: {
+	// 		"Content-Type": "application/json"
+	// 	},
+	// 	body: JSON.stringify({ accessToken })
+	// })
+	// 	.then(res => res.json())
+	// 	.then(data => onDelete())
 }
 
 interface DeleteProps {
@@ -25,11 +37,25 @@ interface DeleteProps {
 const Delete: FC<DeleteProps> = ({ piece }) => {
 	const startDelete = useDisclosure()
 	const endDelete = useDisclosure()
+	const notAdmin = useDisclosure()
 	return (
 		<>
 			<Button size="xs" variant="ghost" p="0" colorScheme='red'>
-				<DeleteIcon onClick={startDelete.onOpen} />
+				<DeleteIcon onClick={
+					() => {
+						checkIsAdmin()
+							.then(res => res.json())
+							.then(d => {
+								if (d.isAdmin) {
+									startDelete.onOpen()
+								} else {
+									notAdmin.onOpen()
+								}
+							})
+					}
+				} />
 			</Button>
+			{/* STAGE ONE */}
 			<Modal isOpen={startDelete.isOpen} onClose={startDelete.onClose}>
 				<ModalOverlay />
 				<ModalContent>
@@ -44,7 +70,7 @@ const Delete: FC<DeleteProps> = ({ piece }) => {
 					<ModalFooter>
 						<ButtonGroup>
 							<Button onClick={() => {
-								del(getCookie("access_token"), () => {
+								deletePiece(getCookie("access_token"), () => {
 									startDelete.onClose();
 									// a white strip will appear on the right 
 									// if time out is not here...
@@ -56,15 +82,35 @@ const Delete: FC<DeleteProps> = ({ piece }) => {
 					</ModalFooter>
 				</ModalContent>
 			</Modal>
+			{/* STAGE TWO */}
 			<Modal isOpen={endDelete.isOpen} onClose={endDelete.onClose}>
 				<ModalOverlay />
 				<ModalContent>
+					<ModalHeader>Deleted</ModalHeader>
 					<ModalBody>
-						Completed
+						{piece.title} has been deleted from the database.
 					</ModalBody>
 					<ModalFooter>
 						<ButtonGroup>
 							<Button onClick={endDelete.onClose}>
+								Close
+							</Button>
+						</ButtonGroup>
+					</ModalFooter>
+				</ModalContent>
+			</Modal>
+			{/* STAGE NOT AN ADMIN */}
+			<Modal isOpen={notAdmin.isOpen} onClose={notAdmin.onClose}>
+				<ModalOverlay />
+				<ModalContent>
+					<ModalHeader>Not enough permissions</ModalHeader>
+					<ModalBody>
+						Only admins can modify the database. Reach out if you
+						want to become an admin.
+					</ModalBody>
+					<ModalFooter>
+						<ButtonGroup>
+							<Button onClick={notAdmin.onClose}>
 								Close
 							</Button>
 						</ButtonGroup>

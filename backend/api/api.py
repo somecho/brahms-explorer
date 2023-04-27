@@ -37,7 +37,7 @@ def is_admin():
         user = requests.get(url)
         if user.json()["email"] not in get_admin_list():
             return {"isAdmin": False}, "400 not an admin"
-        return {"isAdmin": False}
+        return {"isAdmin": True}
     except Exception:
         print("Failed request")
 
