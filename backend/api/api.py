@@ -23,7 +23,7 @@ def handshake():
     return {"connected": True}
 
 
-@cache.cached(timeout=604800)
+@cache.cached(timeout=300)
 @bp.route("/isAdmin", methods=["POST"])
 def is_admin():
     content = request.json
