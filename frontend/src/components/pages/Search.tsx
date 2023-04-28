@@ -68,11 +68,6 @@ const Search = () => {
 			});
 	};
 
-	function onDelete(id: number) {
-		setPieces(pieces.filter(p => p.id !== id))
-		deleteDisclosure.onOpen()
-	}
-
 	return (
 		<>
 			<SearchBar
@@ -99,7 +94,10 @@ const Search = () => {
 						keywords: query.get("keywords") || "",
 					})
 				}}
-				onDelete={onDelete}
+				onDelete={(id: number) => {
+					setPieces(pieces.filter(p => p.id !== id))
+					deleteDisclosure.onOpen()
+				}}
 				hasMore={pieces.length !== resultsSize}
 				isLoading={pieces.length === 0 && resultsSize !== 0}
 				pieces={pieces}
