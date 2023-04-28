@@ -8,7 +8,8 @@ interface ResultProps {
 	next: () => void,
 	hasMore: boolean,
 	isLoading: boolean,
-	pieces: Piece[]
+	pieces: Piece[],
+	onDelete: (id: number) => void
 }
 
 const Results: FC<ResultProps> = (props: ResultProps) => {
@@ -22,7 +23,7 @@ const Results: FC<ResultProps> = (props: ResultProps) => {
 					hasMore={props.hasMore}
 				>
 					<Container maxW="container.md">
-						{props.pieces.map(p => <PieceCard piece={p} key={p.id} />)}
+						{props.pieces.map(p => <PieceCard piece={p} key={p.id} onDelete={props.onDelete} />)}
 					</Container>
 				</InfiniteScroll>
 			}

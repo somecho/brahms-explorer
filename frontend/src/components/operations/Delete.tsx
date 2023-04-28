@@ -16,25 +16,24 @@ function checkIsAdmin() {
 	})
 }
 
-function deletePiece(accessToken: string, onDelete: () => void) {
-	onDelete()
-	// const url = getUrl()
-	// fetch(`${url}/api/isAdmin`, {
-	// 	method: "POST",
-	// 	headers: {
-	// 		"Content-Type": "application/json"
-	// 	},
-	// 	body: JSON.stringify({ accessToken })
-	// })
-	// 	.then(res => res.json())
-	// 	.then(data => onDelete())
+function deletePiece(id: number, onConfirm: () => void) {
+	fetch(`${getUrl()}/api/piece/${id}`, {
+		method: "DELETE",
+		headers: {
+			"Content-Type": "application/json"
+		},
+		body: JSON.stringify({ accessToken: getCookie("access_token") })
+	}).then(_ => {
+		onConfirm()
+	})
 }
 
 interface DeleteProps {
-	piece: Piece
+	piece: Piece,
+	onDelete: (id: number) => void
 }
 
-const Delete: FC<DeleteProps> = ({ piece }) => {
+const Delete: FC<DeleteProps> = ({ piece, onDelete }) => {
 	const startDelete = useDisclosure()
 	const endDelete = useDisclosure()
 	const notAdmin = useDisclosure()
@@ -70,31 +69,16 @@ const Delete: FC<DeleteProps> = ({ piece }) => {
 					<ModalFooter>
 						<ButtonGroup>
 							<Button onClick={() => {
-								deletePiece(getCookie("access_token"), () => {
+								deletePiece(piece.id, () => {
 									startDelete.onClose();
 									// a white strip will appear on the right 
 									// if time out is not here...
-									setTimeout(endDelete.onOpen, 100);
+									endDelete.onOpen();
+									// setTimeout(endDelete.onOpen, 100);
+									onDelete(piece.id)
 								})
 							}} colorScheme="red">delete</Button>
 							<Button onClick={startDelete.onClose}>cancel</Button>
-						</ButtonGroup>
-					</ModalFooter>
-				</ModalContent>
-			</Modal>
-			{/* STAGE TWO */}
-			<Modal isOpen={endDelete.isOpen} onClose={endDelete.onClose}>
-				<ModalOverlay />
-				<ModalContent>
-					<ModalHeader>Deleted</ModalHeader>
-					<ModalBody>
-						{piece.title} has been deleted from the database.
-					</ModalBody>
-					<ModalFooter>
-						<ButtonGroup>
-							<Button onClick={endDelete.onClose}>
-								Close
-							</Button>
 						</ButtonGroup>
 					</ModalFooter>
 				</ModalContent>

@@ -7,7 +7,8 @@ import Delete from '../operations/Delete';
 
 
 interface PieceCardProps {
-	piece: Piece
+	piece: Piece,
+	onDelete: (id:number)=>void
 }
 
 function formatDuration(seconds: number): string {
@@ -18,7 +19,7 @@ function formatDuration(seconds: number): string {
 
 
 
-const PieceCard: FC<PieceCardProps> = ({ piece }) => {
+const PieceCard: FC<PieceCardProps> = ({ piece, onDelete }) => {
 	const user = getCookie("currentUser");
 	return (
 		<Card variant="outline" my="0.5em">
@@ -45,7 +46,7 @@ const PieceCard: FC<PieceCardProps> = ({ piece }) => {
 					</div>
 					{user &&
 						<ButtonGroup padding="0">
-							<Delete piece={piece} />
+							<Delete piece={piece} onDelete={onDelete}/>
 							<Button size="xs" variant="ghost" p="0" colorScheme='gray'>
 								<EditIcon />
 							</Button>

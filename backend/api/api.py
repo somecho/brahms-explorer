@@ -23,7 +23,15 @@ def handshake():
     return {"connected": True}
 
 
-@cache.cached(timeout=300)
+def authorized(access_token):
+    url = f"https://www.googleapis.com/oauth2/v3/tokeninfo?access_token={access_token}"
+    user = requests.get(url)
+    if user.json()["email"] not in get_admin_list():
+        return False
+    return True
+
+
+@cache.cached(timeout=604800)
 @bp.route("/isAdmin", methods=["POST"])
 def is_admin():
     content = request.json
@@ -33,13 +41,11 @@ def is_admin():
         return "", "400 'accessToken' is an empty string"
     access_token = content["accessToken"]
     try:
-        url = f"https://www.googleapis.com/oauth2/v3/tokeninfo?access_token={access_token}"
-        user = requests.get(url)
-        if user.json()["email"] not in get_admin_list():
+        if not authorized(access_token):
             return {"isAdmin": False}, "400 not an admin"
         return {"isAdmin": True}
-    except Exception:
-        print("Failed request")
+    except Exception as e:
+        print(e)
 
 
 @cache.cached(timeout=604800)
@@ -96,8 +102,43 @@ map_order_by = {
 }
 
 
+@bp.route("/piece/<id>", methods=["GET", "DELETE"])
+def piece(id):
+    if request.method == "GET":
+        query = (db.session.query(Title.string,
+                                  Subtitle.string,
+                                  Composer.string,
+                                  FullYear.string,
+                                  Piece.duration,
+                                  Piece.id)
+                 .select_from(Piece)
+                 .join(Composer, Piece.composer == Composer.id)
+                 .join(Title, Piece.title == Title.id)
+                 .join(Subtitle, Piece.subtitle == Subtitle.id)
+                 .join(FullYear, Piece.full_year == FullYear.id)
+                 .filter(Piece.id == id))
+        a = query.first()
+        return dict(title=a[0],
+                    subtitle=a[1],
+                    composer=a[2],
+                    year=a[3],
+                    duration=a[4],
+                    id=a[5])
+    if request.method == "DELETE":
+        try:
+            if authorized(request.json["accessToken"]):
+                db.session.query(Piece).filter(Piece.id == id).delete()
+                db.session.commit()
+                return "", "204 successfully deleted"
+            else:
+                return "", "400 not authorized"
+        except Exception as e:
+            print(e)
+            return "", "400 delete failed"
+
+
 @cache.cached(timeout=604800, query_string=True)
-@bp.route("/pieces", methods=["POST", "GET"])
+@bp.route("/pieces", methods=["GET"])
 def pieces():
     if request.method == "GET":
         limit = request.args.get("limit") or 10

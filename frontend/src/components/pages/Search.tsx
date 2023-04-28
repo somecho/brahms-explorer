@@ -9,7 +9,8 @@ import { orderButtons, sortButtons } from "../../types/Button";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "../../hooks/useQuery";
 import { useEffect, useState } from "react";
-import { Container, Text } from "@chakra-ui/react";
+import { Container, Text, useDisclosure } from "@chakra-ui/react";
+import DeleteSuccessModal from "../operations/DeleteSuccessModal";
 
 const Search = () => {
 	const [pieces, setPieces] = useState<Piece[]>([]);
@@ -68,6 +69,12 @@ const Search = () => {
 			});
 	};
 
+	const deleteDisclosure = useDisclosure();
+	function onDelete(id: number) {
+		setPieces(pieces.filter(p => p.id !== id))
+		deleteDisclosure.onOpen()
+	}
+
 	return (
 		<>
 			<SearchBar
@@ -94,9 +101,14 @@ const Search = () => {
 						keywords: query.get("keywords") || "",
 					})
 				}}
+				onDelete={onDelete}
 				hasMore={pieces.length !== resultsSize}
 				isLoading={pieces.length === 0 && resultsSize !== 0}
 				pieces={pieces}
+			/>
+			<DeleteSuccessModal
+				isOpen={deleteDisclosure.isOpen}
+				onClose={deleteDisclosure.onClose}
 			/>
 		</>
 	);
