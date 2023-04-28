@@ -54,7 +54,7 @@ const Search = () => {
 				limit: 10,
 				offset: 0,
 				keywords: query.get("keywords") as Criteria,
-				count: pieces.length == 0
+				count: pieces.length == 0 && (query.get("keywords") !== null)
 			})
 		}
 	}, [pieces])
