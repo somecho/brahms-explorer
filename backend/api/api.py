@@ -9,14 +9,6 @@ from .admin import authorized
 bp = Blueprint("api", __name__, url_prefix="/api/")
 
 
-@bp.route("/handshake")
-def handshake():
-    """Sometimes the webservice has to go through a cold startup.
-    Apps should call this endpoint at the beginning to verify
-    connection."""
-    return {"connected": True}
-
-
 def process_keywords(keywords):
     if keywords:
         k = keywords or ""
