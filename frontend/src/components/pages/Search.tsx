@@ -10,7 +10,6 @@ import { useNavigate } from "react-router-dom";
 import { useQuery } from "../../hooks/useQuery";
 import { useEffect, useState } from "react";
 import { Container, Text, useDisclosure } from "@chakra-ui/react";
-import DeleteSuccessModal from "../operations/DeleteSuccessModal";
 import SimpleModal from "../shared/Modal";
 
 const Search = () => {
