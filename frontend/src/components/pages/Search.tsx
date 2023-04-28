@@ -11,6 +11,7 @@ import { useQuery } from "../../hooks/useQuery";
 import { useEffect, useState } from "react";
 import { Container, Text, useDisclosure } from "@chakra-ui/react";
 import DeleteSuccessModal from "../operations/DeleteSuccessModal";
+import SimpleModal from "../shared/Modal";
 
 const Search = () => {
 	const [pieces, setPieces] = useState<Piece[]>([]);
@@ -106,9 +107,11 @@ const Search = () => {
 				isLoading={pieces.length === 0 && resultsSize !== 0}
 				pieces={pieces}
 			/>
-			<DeleteSuccessModal
+			<SimpleModal
 				isOpen={deleteDisclosure.isOpen}
 				onClose={deleteDisclosure.onClose}
+				header="Deleted"
+				body="Successfully deleted"
 			/>
 		</>
 	);

@@ -4,6 +4,7 @@ import { Button, ButtonGroup, Flex, Modal, ModalBody, ModalContent, Text, ModalF
 import { getCookie } from "react-use-cookie"
 import { getUrl } from "../../utils/api"
 import { Piece } from "../../types/Piece"
+import SimpleModal from "../shared/Modal"
 
 function checkIsAdmin() {
 	const url = getUrl()
@@ -35,7 +36,6 @@ interface DeleteProps {
 
 const Delete: FC<DeleteProps> = ({ piece, onDelete }) => {
 	const startDelete = useDisclosure()
-	const endDelete = useDisclosure()
 	const notAdmin = useDisclosure()
 	return (
 		<>
@@ -71,10 +71,6 @@ const Delete: FC<DeleteProps> = ({ piece, onDelete }) => {
 							<Button onClick={() => {
 								deletePiece(piece.id, () => {
 									startDelete.onClose();
-									// a white strip will appear on the right 
-									// if time out is not here...
-									endDelete.onOpen();
-									// setTimeout(endDelete.onOpen, 100);
 									onDelete(piece.id)
 								})
 							}} colorScheme="red">delete</Button>
@@ -83,24 +79,15 @@ const Delete: FC<DeleteProps> = ({ piece, onDelete }) => {
 					</ModalFooter>
 				</ModalContent>
 			</Modal>
-			{/* STAGE NOT AN ADMIN */}
-			<Modal isOpen={notAdmin.isOpen} onClose={notAdmin.onClose}>
-				<ModalOverlay />
-				<ModalContent>
-					<ModalHeader>Not enough permissions</ModalHeader>
-					<ModalBody>
-						Only admins can modify the database. Reach out if you
-						want to become an admin.
-					</ModalBody>
-					<ModalFooter>
-						<ButtonGroup>
-							<Button onClick={notAdmin.onClose}>
-								Close
-							</Button>
-						</ButtonGroup>
-					</ModalFooter>
-				</ModalContent>
-			</Modal>
+			<SimpleModal
+				isOpen={notAdmin.isOpen}
+				onClose={notAdmin.onClose}
+				header="Not enough permissions"
+				body="Only admins can modify the database. 
+							Reach out if you want to become an admin.
+							If you are an admin and you are seeing this, your session has expired.
+							Please logout and login again."
+			/>
 		</>
 	)
 }

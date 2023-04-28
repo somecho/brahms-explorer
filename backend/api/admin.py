@@ -12,11 +12,14 @@ def get_admin_list():
 
 
 def authorized(access_token):
-    url = f"https://www.googleapis.com/oauth2/v3/tokeninfo?access_token={access_token}"
-    user = requests.get(url)
-    if user.json()["email"] not in get_admin_list():
-        return False
-    return True
+    try:
+        url = f"https://www.googleapis.com/oauth2/v3/tokeninfo?access_token={access_token}"
+        user = requests.get(url)
+        if user.json()["email"] not in get_admin_list():
+            return False
+        return True
+    except Exception as e:
+        print(e)
 
 
 @cache.cached(timeout=604800)
