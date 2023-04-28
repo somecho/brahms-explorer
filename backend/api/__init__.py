@@ -29,7 +29,9 @@ def create_app():
     with app.app_context():
         db.Model.metadata.reflect(db.engine)
 
-    from . import api
+    from . import admin, api, count
+    app.register_blueprint(admin.bp)
     app.register_blueprint(api.bp)
+    app.register_blueprint(count.bp)
 
     return app

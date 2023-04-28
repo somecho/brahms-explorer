@@ -32,8 +32,8 @@ const Stats = () => {
 	useEffect(() => {
 		Promise.all(
 			[
-				queryAPI<QueryResult>("pieces/count"),
-				queryAPI<QueryResult>("composers/count"),
+				queryAPI<QueryResult>("count/piece"),
+				queryAPI<QueryResult>("count/composer"),
 				queryAPI<QueryResult>("last-updated")
 			]).then(r => {
 				setStats({

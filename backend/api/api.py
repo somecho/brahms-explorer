@@ -3,16 +3,10 @@ from flask import Blueprint, request
 from sqlalchemy import or_, and_, func
 from . import db
 from . import cache
-import requests
-import os
+from .admin import authorized
 
 
 bp = Blueprint("api", __name__, url_prefix="/api/")
-
-
-def get_admin_list():
-    ADMINS = os.environ['ADMINS'].split(",")
-    return ADMINS
 
 
 @bp.route("/handshake")
@@ -21,56 +15,6 @@ def handshake():
     Apps should call this endpoint at the beginning to verify
     connection."""
     return {"connected": True}
-
-
-def authorized(access_token):
-    url = f"https://www.googleapis.com/oauth2/v3/tokeninfo?access_token={access_token}"
-    user = requests.get(url)
-    if user.json()["email"] not in get_admin_list():
-        return False
-    return True
-
-
-@cache.cached(timeout=604800)
-@bp.route("/isAdmin", methods=["POST"])
-def is_admin():
-    content = request.json
-    if "accessToken" not in content.keys():
-        return "", "400 Missing 'accessToken' in body"
-    if content["accessToken"] == "":
-        return "", "400 'accessToken' is an empty string"
-    access_token = content["accessToken"]
-    try:
-        if not authorized(access_token):
-            return {"isAdmin": False}, "400 not an admin"
-        return {"isAdmin": True}
-    except Exception as e:
-        print(e)
-
-
-@cache.cached(timeout=604800)
-@bp.route("/composers/count")
-def composers_count():
-    count = db.session.query(Composer.id).count()
-    return {'size': count}
-
-
-@cache.cached(timeout=604800)
-@bp.route("/pieces/count")
-def pieces_count():
-    keywords = process_keywords(request.args.get("keywords"))
-    or_queries = [or_(Title.string.contains(w),
-                      Subtitle.string.contains(w),
-                      Composer.string.contains(w),
-                      FullYear.string.contains(w)) for w in keywords]
-    count = (Piece.query
-             .join(Composer, Piece.composer == Composer.id)
-             .join(Title, Piece.title == Title.id)
-             .join(Subtitle, Piece.subtitle == Subtitle.id)
-             .join(FullYear, Piece.full_year == FullYear.id)
-             .filter(and_(*or_queries))
-             .count())
-    return {'size': count}
 
 
 def process_keywords(keywords):
@@ -102,39 +46,18 @@ map_order_by = {
 }
 
 
-@bp.route("/piece/<id>", methods=["GET", "DELETE"])
-def piece(id):
-    if request.method == "GET":
-        query = (db.session.query(Title.string,
-                                  Subtitle.string,
-                                  Composer.string,
-                                  FullYear.string,
-                                  Piece.duration,
-                                  Piece.id)
-                 .select_from(Piece)
-                 .join(Composer, Piece.composer == Composer.id)
-                 .join(Title, Piece.title == Title.id)
-                 .join(Subtitle, Piece.subtitle == Subtitle.id)
-                 .join(FullYear, Piece.full_year == FullYear.id)
-                 .filter(Piece.id == id))
-        a = query.first()
-        return dict(title=a[0],
-                    subtitle=a[1],
-                    composer=a[2],
-                    year=a[3],
-                    duration=a[4],
-                    id=a[5])
-    if request.method == "DELETE":
-        try:
-            if authorized(request.json["accessToken"]):
-                db.session.query(Piece).filter(Piece.id == id).delete()
-                db.session.commit()
-                return "", "204 successfully deleted"
-            else:
-                return "", "400 not authorized"
-        except Exception as e:
-            print(e)
-            return "", "400 delete failed"
+@bp.route("/piece/<id>", methods=["DELETE"])
+def delete_piece(id):
+    try:
+        if authorized(request.json["accessToken"]):
+            db.session.query(Piece).filter(Piece.id == id).delete()
+            db.session.commit()
+            return "", "204 successfully deleted"
+        else:
+            return "", "400 not authorized"
+    except Exception as e:
+        print(e)
+        return "", "400 delete failed"
 
 
 @cache.cached(timeout=604800, query_string=True)
