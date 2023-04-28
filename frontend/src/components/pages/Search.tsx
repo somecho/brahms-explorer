@@ -13,16 +13,29 @@ import { Container, Text, useDisclosure } from "@chakra-ui/react";
 import SimpleModal from "../shared/Modal";
 
 const Search = () => {
+	window.onpopstate = (_) => navigate(0);
 	const [pieces, setPieces] = useState<Piece[]>([]);
 	const [resultsSize, setResultsSize] = useState<number>(-1);
-	const query = useQuery();
-	const navigate = useNavigate();
-	window.onpopstate = (_) => navigate(0);
-
 	const [queryParams, setQueryParams] = useState<Params>({
 		orderBy: "title",
 		ascending: true,
 	});
+	const query = useQuery();
+	const navigate = useNavigate();
+	const deleteDisclosure = useDisclosure();
+
+	useEffect(() => {
+		if (pieces.length == 0) {
+			queryCatalog({
+				orderBy: queryParams.orderBy,
+				ascending: queryParams.ascending,
+				limit: 10,
+				offset: 0,
+				keywords: query.get("keywords") as Criteria,
+				count: pieces.length == 0 && (query.get("keywords") !== null)
+			})
+		}
+	}, [pieces])
 
 	const setSort = (orderBy: Criteria) => {
 		setQueryParams({ ...queryParams, orderBy });
@@ -45,20 +58,6 @@ const Search = () => {
 			navigate(url);
 		}
 	};
-
-	useEffect(() => {
-		if (pieces.length == 0) {
-			queryCatalog({
-				orderBy: queryParams.orderBy,
-				ascending: queryParams.ascending,
-				limit: 10,
-				offset: 0,
-				keywords: query.get("keywords") as Criteria,
-				count: pieces.length == 0 && (query.get("keywords") !== null)
-			})
-		}
-	}, [pieces])
-
 	const queryCatalog = (params: Params) => {
 		queryAPI<{ results: Piece[], count?: number }>('pieces', params)
 			.then(data => {
@@ -69,7 +68,6 @@ const Search = () => {
 			});
 	};
 
-	const deleteDisclosure = useDisclosure();
 	function onDelete(id: number) {
 		setPieces(pieces.filter(p => p.id !== id))
 		deleteDisclosure.onOpen()

@@ -23,7 +23,10 @@ const Results: FC<ResultProps> = (props: ResultProps) => {
 					hasMore={props.hasMore}
 				>
 					<Container maxW="container.md">
-						{props.pieces.map(p => <PieceCard piece={p} key={p.id} onDelete={props.onDelete} />)}
+						{props.pieces.map(p => <PieceCard
+							piece={p}
+							key={p.id}
+							onDelete={props.onDelete} />)}
 					</Container>
 				</InfiniteScroll>
 			}

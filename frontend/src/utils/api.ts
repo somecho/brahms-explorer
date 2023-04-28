@@ -1,3 +1,4 @@
+import { getCookie } from "react-use-cookie";
 import { Params } from "../types/Params";
 
 /**
@@ -39,3 +40,29 @@ export async function queryAPI<T>(endpoint: string, params: Params = {}): Promis
 	return fetch(`${getUrl()}/api/${endpoint}?${buildQueryString(params)}`)
 		.then(res => res.json())
 }
+
+export async function checkIsAdmin() {
+	const url = getUrl()
+	return fetch(`${url}/api/isAdmin`, {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json"
+		},
+		body: JSON.stringify({ accessToken: getCookie("access_token") })
+	})
+}
+
+
+export function deletePiece(id: number, onConfirm: () => void) {
+	fetch(`${getUrl()}/api/piece/${id}`, {
+		method: "DELETE",
+		headers: {
+			"Content-Type": "application/json"
+		},
+		body: JSON.stringify({ accessToken: getCookie("access_token") })
+	}).then(_ => {
+		onConfirm()
+	})
+}
+
+
