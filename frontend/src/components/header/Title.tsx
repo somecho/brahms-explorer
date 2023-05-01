@@ -9,7 +9,7 @@ const Title: FC<TitleProps> = () => {
 			as="h1"
 			fontSize={["3xl","5xl"]}
 			fontWeight="black"
-			color="white">The B.R.A.H.M.S. Explorer</Heading>
+			color="white"><a href="/">The B.R.A.H.M.S. Explorer</a></Heading>
 	)
 }
 
