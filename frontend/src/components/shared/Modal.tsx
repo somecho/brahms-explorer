@@ -1,13 +1,13 @@
 import { Button, ButtonGroup, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, ModalOverlay } from "@chakra-ui/react"
 import { FC } from "react"
+import { ModalProps } from "../../types/ModalProps"
 
-interface SimpleModalProps {
-	isOpen: boolean,
-	onClose: () => void,
+interface SimpleModalProps extends ModalProps {
 	header: string,
 	body: string,
 	buttonText?: string,
 }
+
 const SimpleModal: FC<SimpleModalProps> = ({
 	isOpen, onClose, header, body, buttonText = "close"
 }) => {
