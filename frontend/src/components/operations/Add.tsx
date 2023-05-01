@@ -32,7 +32,7 @@ const Add: FC<AddProps> = () => {
 	}
 
 	return isAdmin && (
-		<Container maxW="container.md">
+		<Container maxW="container.md" mb="1.5em">
 			<Button
 				leftIcon={<AddIcon />}
 				borderRadius="25px"
