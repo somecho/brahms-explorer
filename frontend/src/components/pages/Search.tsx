@@ -9,8 +9,9 @@ import { orderButtons, sortButtons } from "../../types/Button";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "../../hooks/useQuery";
 import { useEffect, useState } from "react";
-import { Container, Text, useDisclosure } from "@chakra-ui/react";
+import { Button, Container, Text, useDisclosure } from "@chakra-ui/react";
 import SimpleModal from "../shared/Modal";
+import { AddIcon } from "@chakra-ui/icons";
 
 const Search = () => {
 	window.onpopstate = (_) => navigate(0);
@@ -78,6 +79,16 @@ const Search = () => {
 				setOrder={setOrder}
 				isLoading={pieces.length === 0 && resultsSize !== 0}
 			/>
+			<Container maxW="container.md">
+				<Button
+					leftIcon={<AddIcon />}
+					borderRadius="25px"
+					size='sm'
+					colorScheme="orange"
+				>
+					Add a piece
+				</Button>
+			</Container>
 			<Spinner isLoading={pieces.length === 0 && resultsSize !== 0} />
 			<Container maxW="container.md">
 				{pieces.length !== 0 && resultsSize > 0 &&
