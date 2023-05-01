@@ -1,9 +1,10 @@
 import { Text, FormControl, FormLabel, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, ModalOverlay, NumberInput, NumberInputField, ButtonGroup, Button } from "@chakra-ui/react";
 import { ChangeEvent, FC, useEffect, useState } from "react";
 import { ModalProps } from "../../types/ModalProps";
+import { getUrl } from "../../utils/api";
+import { getCookie } from "react-use-cookie";
 
 interface AddFormModalProps extends ModalProps {
-
 }
 type FormState = [string, string, string, string];
 
@@ -29,6 +30,22 @@ const AddFormModal: FC<AddFormModalProps> = ({
 	useEffect(() => {
 		setSubmitDisabled(formState[0] === "" || formState[2] === "")
 	}, [formState])
+	function onSubmit() {
+		const [title, subtitle, composer, year] = formState
+		fetch(`${getUrl()}/api/piece/add`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify({
+				title,
+				subtitle,
+				composer,
+				year,
+				accessToken: getCookie("access_token")
+			})
+		}).then(r => console.log(r))
+	}
 	return (
 		<Modal isOpen={isOpen} onClose={onClose}>
 			<ModalOverlay />
@@ -51,6 +68,7 @@ const AddFormModal: FC<AddFormModalProps> = ({
 						<Button
 							colorScheme={submitDisabled ? "gray" : "orange"}
 							isDisabled={submitDisabled}
+							onClick={onSubmit}
 						>
 							Submit</Button>
 						<Button onClick={onClose}>Cancel</Button>

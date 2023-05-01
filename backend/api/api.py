@@ -4,6 +4,7 @@ from sqlalchemy import or_, and_, func
 from . import db
 from . import cache
 from .admin import authorized
+from . import add
 
 
 bp = Blueprint("api", __name__, url_prefix="/api/")
@@ -37,6 +38,38 @@ map_order_by = {
     "subtitle": Subtitle.string
 }
 
+
+@bp.route("/piece/add", methods=["POST"])
+def add_piece():
+    body = request.json;
+    title = body["title"] or ""
+    composer = body["composer"] or ""
+    if title == "" and composer == "":
+        return "","400 title or composer is empty"
+    subtitle = body["subtitle"] or ""
+    full_year = body["year"] or ""
+    year = int(full_year[:4]) if full_year else None
+    composer = add.process_composer(composer)
+    piece = {
+        "title": title,
+        "composer": composer["full_name"],
+        "subtitle": subtitle,
+        "full_year": full_year,
+        "year": year,
+        "duration": 0
+        }
+    composer = {
+        "first_name":composer["first_name"],
+        "last_name":composer["last_name"],
+        "full_name":composer["full_name"]
+        }    
+    if not add.piece_exists(piece):
+        add.add_piece(piece)
+
+    if not add.composer_exists(composer):
+        add.add_composer(composer)
+
+    return f"{title} added to the database"
 
 @bp.route("/piece/<id>", methods=["DELETE"])
 def delete_piece(id):
