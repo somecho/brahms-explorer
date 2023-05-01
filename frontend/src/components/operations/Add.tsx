@@ -1,7 +1,8 @@
 import { AddIcon } from "@chakra-ui/icons";
 import { Button, Container, useDisclosure } from "@chakra-ui/react";
-import { FC } from "react";
+import { FC, useState } from "react";
 import AddFormModal from "./AddFormModal";
+import { checkIsAdmin } from "../../utils/api";
 
 interface AddProps {
 
@@ -9,7 +10,11 @@ interface AddProps {
 
 const Add: FC<AddProps> = () => {
 	const add = useDisclosure();
-	return (
+	const [isAdmin, setIsAdmin] = useState<boolean>(false);
+	checkIsAdmin()
+		.then(d => d.json())
+		.then(d => setIsAdmin(d.isAdmin))
+	return isAdmin && (
 		<Container maxW="container.md">
 			<Button
 				leftIcon={<AddIcon />}
