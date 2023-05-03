@@ -72,7 +72,7 @@ def add_piece():
     return f"{title} added to the database"
 
 @bp.route("/piece/<id>", methods=["DELETE","PUT"])
-def delete_piece(id):
+def operate_piece(id):
     # check for authorization
     if not authorized(request.json["accessToken"]):
         return "", "400 not authorized"
