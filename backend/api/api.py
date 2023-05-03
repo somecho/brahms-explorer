@@ -73,14 +73,13 @@ def add_piece():
 
 @bp.route("/piece/<id>", methods=["DELETE","PUT"])
 def delete_piece(id):
+    if not authorized(request.json["accessToken"]):
+        return "", "400 not authorized"
     if request.method == "DELETE":
         try:
-            if authorized(request.json["accessToken"]):
-                db.session.query(Piece).filter(Piece.id == id).delete()
-                db.session.commit()
-                return "", "204 successfully deleted"
-            else:
-                return "", "400 not authorized"
+            db.session.query(Piece).filter(Piece.id == id).delete()
+            db.session.commit()
+            return "", "204 successfully deleted"
         except Exception as e:
             print(e)
             return "", "400 delete failed"
