@@ -73,8 +73,68 @@ def add_piece():
 
 @bp.route("/piece/<id>", methods=["DELETE","PUT"])
 def delete_piece(id):
+    # check for authorization
     if not authorized(request.json["accessToken"]):
         return "", "400 not authorized"
+
+    # update method
+    if request.method == "PUT":
+        print("beginning update request")
+        piece = Piece.query.get(id)
+        if not piece:
+            return "", f"400 piece with {id} not found"
+        print("piece with id found")
+        title = request.json["title"] or ""
+        if title == "":
+            return "", f"400 title field cannot be empty"
+        composer = request.json["composer"] or ""
+        if composer == "":
+            return "", f"400 composer field cannot be empty"
+        subtitle = request.json["subtitle"] or ""
+        full_year = request.json["year"] or ""
+
+        # hash the strings
+        h_title = add.hash_string(title)
+        h_subtitle = add.hash_string(subtitle)
+        h_composer = add.hash_string(composer)
+        h_full_year = add.hash_string(full_year)
+
+        # update piece
+        piece.title = h_title
+        piece.subtitle = h_subtitle
+        piece.full_year = h_full_year
+        piece.year =  int(full_year[:4]) if full_year else None
+        piece.composer = h_composer
+        db.session.commit()
+
+        # update other tables by checking if they exist
+        if not Title.query.get(h_title):
+            db.session.add(Title(
+                id=h_title,
+                string=title))
+        s_composer = add.process_composer(composer)
+
+        if not Composer.query.get(h_composer):
+            db.session.add(Composer(
+                id=h_composer,
+                string=s_composer["full_name"],
+                first_name=s_composer["first_name"],
+                last_name = s_composer["last_name"]))
+
+        if not Subtitle.query.get(h_subtitle):
+            db.session.add(Subtitle(
+                id=h_subtitle,
+                string=subtitle))
+
+        if not FullYear.query.get(h_full_year):
+            db.session.add(FullYear(
+                id=h_full_year,
+                string=full_year))
+
+        db.session.commit()
+        return "", "200 successfully updated"
+
+    # delete method
     if request.method == "DELETE":
         try:
             db.session.query(Piece).filter(Piece.id == id).delete()
