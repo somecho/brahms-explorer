@@ -1,5 +1,6 @@
 import { getCookie } from "react-use-cookie";
 import { Params } from "../types/Params";
+import { Piece } from "../types/Piece";
 
 /**
  * Formats an array of words to be sent via URL query string
@@ -65,4 +66,18 @@ export function deletePiece(id: number, onConfirm: () => void) {
 	})
 }
 
-
+export async function editPiece(piece: Piece) {
+	return fetch(`${getUrl()}/api/piece/${piece.id}`, {
+		method: "PUT",
+		headers: {
+			"Content-Type": "application/json"
+		},
+		body: JSON.stringify({
+			accessToken: getCookie("access_token"),
+			title: piece.title,
+			subtitle: piece.subtitle,
+			year: piece.year,
+			composer: piece.composer
+		})
+	})
+}

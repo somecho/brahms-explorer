@@ -4,11 +4,12 @@ import { Piece } from '../../types/Piece';
 import { EditIcon } from '@chakra-ui/icons';
 import { getCookie } from 'react-use-cookie';
 import Delete from '../operations/Delete';
+import Edit from '../operations/Edit';
 
 
 interface PieceCardProps {
 	piece: Piece,
-	onDelete: (id:number)=>void
+	onDelete: (id: number) => void
 }
 
 function formatDuration(seconds: number): string {
@@ -46,10 +47,8 @@ const PieceCard: FC<PieceCardProps> = ({ piece, onDelete }) => {
 					</div>
 					{user &&
 						<ButtonGroup padding="0">
-							<Delete piece={piece} onDelete={onDelete}/>
-							<Button size="xs" variant="ghost" p="0" colorScheme='gray'>
-								<EditIcon />
-							</Button>
+							<Delete piece={piece} onDelete={onDelete} />
+							<Edit piece={piece} />
 						</ButtonGroup>
 					}
 				</Flex>
