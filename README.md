@@ -18,7 +18,7 @@
 ### What is this for?
 IRCAM's B.R.A.H.M.S. database is a valuable resource, hosting large amounts of data about contemporary pieces, composers and even events. As a performer of new music, I often find myself looking through this database for my next pieces. However, the [search page](https://brahms.ircam.fr/en/composers/search/) is a complex form to fill. It features multiple search fields, some for oddly specific details like who the musical assistant is, or whether the piece was written in IRCAM. Searching by instrumentation is also rather convoluted. An arbitrary set of [instrumentation groups](https://brahms.ircam.fr/en/works/genre/) like "Non-standard mixed instrumental ensemble" or "single wind orchestra" is used to categorize the pieces. 
 
-<div align="center" display="flex">
+<div align="center">
 <img src="https://raw.githubusercontent.com/somecho/brahms-explorer/master/assets/ircam.png" width="480" />
 <p><em>IRCAM's search page</em></p>
 </div>
