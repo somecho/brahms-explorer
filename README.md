@@ -1,4 +1,3 @@
-<!-- Why? Who? What? How? --> 
 # The B.R.A.H.M.S. Explorer
 [The B.R.A.H.M.S. Explorer](https://github.com/somecho/brahms-explorer) is a searchable catalog for contemporary music built for musicians, students, teachers and concert organizers. It allows for easy keywords-based search for pieces in the contemporary repertoire. It's great if you're looking for a contemporary piece for some obscure instrumentation _(let's say ... [viola and tuba](https://brahmsexplorer.onrender.com/?keywords=viola%2Ctuba))_ to perform next. Try it out for yourself [here](https://brahmsexplorer.onrender.com/).
 
